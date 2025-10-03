@@ -1,0 +1,259 @@
+import sequelize from '../database/connection.js'
+
+import db from '../models/index.js'
+const Campana = db.Campana
+const Formulario = db.Formulario
+const BaseCampana = db.BaseCampana
+const User = db.User
+
+
+// Mostrar formulario
+export async function mostrarFormularioRegistro(req, res) {
+    try {
+        const { id } = req.params;
+        const campana = await Campana.findByPk(id);
+        
+        if (!campana) {
+            req.session.swalError = "Campaña no encontrada";
+            return res.redirect('/campaign/campanas');
+        }
+
+        res.render('campaignViews/agregar_registro', {
+            campana: campana.toJSON()
+        });
+
+    } catch (error) {
+        console.error('Error:', error);
+        req.session.swalError = "Error al cargar el formulario";
+        res.redirect('/campaign/campanas');
+    }
+}
+
+// Procesar formulario
+export async function agregarRegistroManual(req, res) {
+    const transaction = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        const { nombre, telefono, correo, ...datosExtra } = req.body;
+
+        // Validación mejorada
+        if (!nombre?.trim() || !telefono?.trim() || !correo?.trim()) {
+            throw new Error("Todos los campos obligatorios deben estar completos");
+        }
+
+        // Procesamiento de datos adicionales
+        const otrosCampos = {};
+        Object.entries(datosExtra).forEach(([key, value]) => {
+            if (value && key !== 'id' && key !== 'campanaId') {
+                otrosCampos[key] = value;
+            }
+        });
+
+        // Crear registro optimizado para JSONB
+        await BaseCampana.create({
+            nombre: nombre.trim(),
+            telefono: telefono.replace(/\D/g, ''),
+            correo: correo.toLowerCase().trim(),
+            otrosCampos: Object.keys(otrosCampos).length > 0 ? otrosCampos : null,
+            campanaId: id
+        }, { transaction });
+
+        await transaction.commit();
+        req.session.mensajeExito = "✅ Registro agregado correctamente";
+    } catch (error) {
+        await transaction.rollback();
+        console.error('Error:', error);
+        req.session.swalError = error.message || "Error al guardar el registro";
+    }
+    res.redirect(`/campaign/campanas/${req.params.id}/ver-base`);
+}
+
+export function agregarRegistrosEnBloque(req, res) {
+    res.render("campaignViews/agregar_registros_enbloque", { layout: 'layouts/generalLayout' });
+}
+
+export async function verCampanas(req, res) {
+    try {
+        const campanas = await Campana.findAll({
+            order: [['createdAt', 'DESC']], // Usar camelCase como en el modelo
+            include: [{
+                model: BaseCampana,
+                as: 'registros',
+                attributes: [],
+                required: false
+            }],
+            attributes: [
+                'id',
+                'nombre',
+                'estado',
+                'createdAt', // Usar el nombre del modelo (camelCase)
+                [sequelize.fn('COUNT', sequelize.col('registros.id')), 'cantidadRegistros']
+            ],
+            group: ['Campana.id'],
+            raw: true // Importante para evitar conflictos
+        });
+
+        res.render('campaignViews/campañas', {
+            campanas: campanas.map(c => ({
+                ...c,
+                cantidadRegistros: c.cantidadRegistros,
+                createdAt: c.createdAt // Valor directo sin transformaciones
+            }))
+        });
+
+    } catch (error) {
+        console.error('Error al cargar campañas:', error);
+        req.session.swalError = "Error interno al cargar las campañas";
+        res.redirect('/campaign/campanas');
+    }
+}
+
+export async function eliminarCampana(req, res) {
+    const transaction = await sequelize.transaction();
+    try {
+        const { id } = req.params;
+        
+        await BaseCampana.destroy({ where: { campanaId: id }, transaction });
+        await Campana.destroy({ where: { id }, transaction });
+
+        await transaction.commit();
+        req.session.mensajeExito = "Campaña eliminada exitosamente";
+    } catch (error) {
+        await transaction.rollback();
+        console.error('Error eliminando campaña:', error);
+        req.session.swalError = "No se pudo eliminar la campaña";
+    }
+    res.redirect('/campaign/campanas');
+}
+
+export function modificarCampana(req, res) {
+    res.render("campaignViews/modificar_campaña", { layout: 'layouts/generalLayout' });
+}
+
+export function volverALlamar(req, res) {
+    res.render("campaignViews/reg_volverallamar", { layout: 'layouts/generalLayout' });
+}
+
+export async function mostrarBaseDatosCampana(req, res) {
+    try {
+        const { id } = req.params;
+
+        // Obtener campaña con su formulario y registros
+        const campana = await Campana.findByPk(id, {
+            include: [
+                {
+                    model: Formulario,
+                    as: 'formulario',
+                    attributes: ['id', 'campos'] // Campo que almacena las opciones de tipificación
+                },
+                {
+                    model: BaseCampana,
+                    as: 'registros',
+                    include: [{
+                        model: User,
+                        as: 'agente',
+                        attributes: ['primerNombre', 'primerApellido']
+                    }]
+                }
+            ]
+        });
+
+        if (!campana) {
+            req.session.swalError = "Campaña no encontrada";
+            return res.redirect('/campaign/campanas');
+        }
+
+        res.render('campaignViews/ver_base', {
+            campana: campana.toJSON(),
+            registros: campana.registros.map(registro => ({
+                ...registro.toJSON(),
+                // Traducir el valor de la tipificación usando el formulario
+                tipificacion: registro.tipificacion || "Sin gestionar",
+                // Formatear nombre del agente
+                agente: registro.agente 
+                    ? `${registro.agente.primerNombre} ${registro.agente.primerApellido}` 
+                    : "Sin asignar"
+            }))
+        });
+
+    } catch (error) {
+        console.error('Error cargando la base:', error);
+        req.session.swalError = "Error al cargar los registros";
+        res.redirect('/campaign/campanas');
+    }
+}
+
+export async function mostrarFormularioGestion(req, res) {
+    try {
+        const { campanaId, registroId } = req.params;
+
+        // 1. Obtener el registro con su campaña y formulario asociado
+        const registro = await BaseCampana.findByPk(registroId, {
+            include: [{
+                model: Campana,
+                as: 'campana',
+                include: [{
+                    model: Formulario,
+                    as: 'formulario'
+                }]
+            }]
+        });
+
+        if (!registro) {
+            req.session.swalError = "Registro no encontrado";
+            return res.redirect(`/campaign/campanas/${campanaId}/ver-base`);
+        }
+
+        // 2. Extraer SOLO el campo de tipificación del formulario
+        const opcionesTipificacion = registro.campana.formulario.campos || [];
+
+        // 3. Renderizar con los datos específicos
+        res.render('campaignViews/iniciar_gestion', {
+            registro: {
+                ...registro.toJSON(),
+                // Datos básicos
+                nombre: registro.nombre,
+                telefono: registro.telefono,
+                correo: registro.correo,
+                otrosCampos: registro.otrosCampos || {}
+            },
+            opcionesTipificacion, // Envía solo el campo de tipificación
+            campanaId
+        });
+
+    } catch (error) {
+        console.error('Error al cargar gestión:', error);
+        req.session.swalError = "Error al cargar el formulario de gestión";
+        res.redirect(`/campaign/campanas/${campanaId}/ver-base`);
+    }
+}
+
+export async function guardarGestion(req, res) {
+    const transaction = await sequelize.transaction();
+    try {
+        // Asegúrate de capturar ambos parámetros
+        const { campanaId, registroId } = req.params;
+        const { tipificacion } = req.body;
+
+        if (!tipificacion) {
+            throw new Error("Debes seleccionar una tipificación válida");
+        }
+
+        await BaseCampana.update(
+            { tipificacion },
+            { 
+                where: { id: registroId },
+                transaction 
+            }
+        );
+
+        await transaction.commit();
+        req.session.mensajeExito = "✅ Tipificación actualizada correctamente";
+    } catch (error) {
+        await transaction.rollback();
+        console.error('Error al guardar gestión:', error);
+        req.session.swalError = error.message || "Error al guardar los cambios";
+    }
+    // Redirige usando el campanaId capturado de los parámetros
+    res.redirect(`/campaign/campanas/${req.params.campanaId}/ver-base`);
+}

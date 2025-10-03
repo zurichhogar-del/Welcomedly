@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="141" height="141" viewBox="0 0 141 141">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectángulo_17" data-name="Rectángulo 17" width="56.322" height="45.594" fill="#fff"/>
+    </clipPath>
+  </defs>
+  <g id="Grupo_2193" data-name="Grupo 2193" transform="translate(-577 -625)">
+    <g id="Grupo_288" data-name="Grupo 288" transform="translate(1470 -90.852)">
+      <circle id="Elipse_29" data-name="Elipse 29" cx="70.5" cy="70.5" r="70.5" transform="translate(-893 715.852)" fill="#414d5f"/>
+      <g id="Elipse_30" data-name="Elipse 30" transform="translate(-876 732.852)" fill="none" stroke="#fff" stroke-width="3">
+        <circle cx="53.5" cy="53.5" r="53.5" stroke="none"/>
+        <circle cx="53.5" cy="53.5" r="52" fill="none"/>
+      </g>
+      <g id="Grupo_288-2" data-name="Grupo 288" transform="translate(-860.68 765.103)">
+        <g id="ICON_-_ActionPower" data-name="ICON - ActionPower" transform="translate(14.485 1.039)" opacity="0.5">
+          <g id="Grupo_15" data-name="Grupo 15" transform="translate(0 0)" clip-path="url(#clip-path)">
+            <path id="Trazado_40" data-name="Trazado 40" d="M39.962,43.681H7.623A7.5,7.5,0,0,1,0,36.334V19.671a7.5,7.5,0,0,1,7.623-7.348H39.962a7.5,7.5,0,0,1,7.624,7.348V36.334a7.5,7.5,0,0,1-7.624,7.347M7.623,15.211A4.551,4.551,0,0,0,3,19.671V36.334a4.551,4.551,0,0,0,4.626,4.459H39.962a4.551,4.551,0,0,0,4.628-4.459V19.671a4.551,4.551,0,0,0-4.628-4.46Z" transform="translate(0 1.913)" fill="#fff"/>
+            <path id="Trazado_41" data-name="Trazado 41" d="M47.251,31.359H14.912a7.5,7.5,0,0,1-7.623-7.348V7.348A7.5,7.5,0,0,1,14.912,0H47.251a7.5,7.5,0,0,1,7.624,7.348V24.011a7.5,7.5,0,0,1-7.624,7.348M14.912,2.888a4.551,4.551,0,0,0-4.626,4.46V24.011a4.551,4.551,0,0,0,4.626,4.46H47.251a4.551,4.551,0,0,0,4.628-4.46V7.348a4.551,4.551,0,0,0-4.628-4.46Z" transform="translate(1.447 0)" fill="#fff"/>
+          </g>
+        </g>
+        <g id="Grupo_230" data-name="Grupo 230" transform="translate(0)" opacity="0.5">
+          <path id="Trazado_73" data-name="Trazado 73" d="M252.411,18.318a1.592,1.592,0,0,1-1.592-1.592V1.592a1.592,1.592,0,0,1,3.184,0V16.726a1.592,1.592,0,0,1-1.592,1.592" transform="translate(-243.252 0)" fill="#fff"/>
+          <path id="Trazado_74" data-name="Trazado 74" d="M246.152,24.577H231.018a1.592,1.592,0,1,1,0-3.184h15.135a1.592,1.592,0,0,1,0,3.184" transform="translate(-229.426 -13.826)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

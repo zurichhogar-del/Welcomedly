@@ -1,0 +1,53 @@
+
+    <div class="d-flex justify-content-between">
+        <a href="/campaign/campanas" class="btn btn-outline-danger">Volver</a>
+    </div>
+
+        <div class="d-flex align-items-center flex-column mt-3">
+        <div id="añ-ag-reg" class="fs-3 p-2 fw-bold w-100">✨ <%= campana.nombre %></div>
+        <div class="d-flex flex-column align-items-center w-100 pb-3 pt-2" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+            
+            <table class="w-100 px-5     table-auto border border-gray-300 text-sm text-center">
+    <thead>
+        <tr class="bg-gray-100">
+            <th class="p-2 border">Nombre</th>
+            <th class="p-2 border">Teléfono</th>
+            <th class="p-2 border">Correo</th>
+            <th class="p-2 border">Datos adicionales</th>
+            <th class="p-2 border">Tipificación</th>
+            <th class="p-2 border">Agente</th>
+            <th class="p-2 border">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% registros.forEach(registro => { %>
+            <tr>
+                <td class="p-2 border"><%= registro.nombre %></td>
+                <td class="p-2 border"><%= registro.telefono %></td>
+                <td class="p-2 border"><%= registro.correo %></td>
+                
+                <td class="p-2 border">
+                    <% Object.entries(registro.otrosCampos).forEach(([key, value]) => { %>
+                        <strong><%= key %></strong>: <%= value %><br>
+                    <% }) %>
+                </td>
+
+                <td class="p-2 border"><%= registro.tipificacion %></td>
+                <td class="p-2 border"><%= registro.agente %></td>
+                
+                <td class="p-2 border">
+                    <a href="/campaign/campanas/<%= campana.id %>/gestionar/<%= registro.id %>" 
+                    class="btn btn-primary btn-sm" style="background-color: var(--corporate-mint); outline: none; border: none; color: white;">
+                        Gestionar
+                    </a>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+
+
+
+        </div>
+            </div>
+

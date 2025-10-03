@@ -1,0 +1,46 @@
+<a href="/market/market" class="btn btn-outline-danger">Volver</a>
+<a href="/market/crear-formulario" class="btn btn-outline-warning">Crear Formulario</a>
+<div class="d-flex align-items-center flex-column mt-3 p-2" id="cont-ag-reg">
+    <div class="d-flex flex-column align-items-center w-75 pb-1" id="f-ag-reg">
+        <div id="añ-ag-reg" class="fs-3 p-2 fw-bold">📋 Formularios</div>
+        <% if (formularios.length === 0) { %>
+            <p>No hay formularios creados aún.</p>
+        <% } else { %>
+            <div class="w-100 p-4 d-flex flex-column text-center">
+                <% formularios.forEach(formulario => { %>
+                    <div class="w-100 d-flex justify-content-evenly mb-3">
+                        <div class="d-flex flex-column w-50">
+                        <h4 class="fs-3"><%= formulario.nombre %></h4>
+                        <ul class="list-unstyled">
+                            <% formulario.campos.forEach(campo => { %> <!-- Cambio de tipificaciones a campos -->
+                                <li><%= campo %></li>
+                            <% }) %>
+                        </ul>
+                        </div>
+                        <div class="d-flex justify-content-around align-items-center gap-1 w-25">
+                        <button type="submit" class="btn btn-danger" onclick='confirmarEliminacion("<%= formulario.id %>")'>🗑️ Eliminar</button>
+                        <a href="/market/formularios/editar/<%= formulario.id %>" class="btn btn-secondary">✏️ Editar</a>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+    <script>
+        function confirmarEliminacion(id) {
+            Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará al formulario permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            window.location.href = `/market/formularios/eliminar/${id}`;
+            }
+        });
+        }
+        </script>

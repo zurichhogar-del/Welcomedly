@@ -1,0 +1,99 @@
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Agregar Registro Manual</h5>
+            <a href="/campaign/campanas/<%= campana.id %>/ver-base" class="btn btn-sm btn-light">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <form id="formRegistro" action="/campaign/campanas/<%= campana.id %>/agregar-registro" method="POST">
+                <!-- Campos Principales -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre*</label>
+                        <input type="text" class="form-control" name="nombre" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Teléfono*</label>
+                        <input type="tel" class="form-control" name="telefono" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Correo*</label>
+                        <input type="email" class="form-control" name="correo" required>
+                    </div>
+                </div>
+
+                <!-- Campos Dinámicos -->
+                <div class="mb-4">
+                    <h6 class="border-bottom pb-2">📝 Datos Adicionales</h6>
+                    <div id="camposExtraContainer">
+                        <!-- Campos extra se añadirán aquí -->
+                    </div>
+                    <button type="button" id="btnAddCampo" class="btn btn-sm btn-outline-secondary mt-2">
+                        <i class="bi bi-plus"></i> Añadir Campo
+                    </button>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="reset" class="btn btn-outline-danger">Limpiar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Guardar Registro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Script para campos dinámicos -->
+<script>
+document.getElementById('btnAddCampo').addEventListener('click', () => {
+    const container = document.getElementById('camposExtraContainer');
+    const newField = document.createElement('div');
+    newField.className = 'row g-3 mb-2';
+    newField.innerHTML = `
+        <div class="col-md-5">
+            <input type="text" class="form-control" placeholder="Nombre del campo">
+        </div>
+        <div class="col-md-5">
+            <input type="text" class="form-control" placeholder="Valor">
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-sm btn-outline-danger w-100 removerCampo">
+                <i class="bi bi-trash">🗑️ Eliminar</i>
+            </button>
+        </div>
+    `;
+    container.appendChild(newField);
+});
+
+// Delegación de eventos para botones de eliminar
+document.getElementById('camposExtraContainer').addEventListener('click', (e) => {
+    if (e.target.closest('.removerCampo')) {
+        e.target.closest('.row').remove();
+    }
+});
+
+// Procesar formulario antes de enviar
+document.getElementById('formRegistro').addEventListener('submit', (e) => {
+    const otrosCampos = {};
+    document.querySelectorAll('#camposExtraContainer .row').forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        if (inputs[0].value && inputs[1].value) {
+            otrosCampos[inputs[0].value] = inputs[1].value;
+        }
+    });
+
+    // Añadir campos ocultos al formulario
+    Object.entries(otrosCampos).forEach(([key, value]) => {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = key;
+        hiddenInput.value = value;
+        e.target.appendChild(hiddenInput);
+    });
+});
+</script>

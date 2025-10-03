@@ -1,0 +1,19 @@
+
+<div id="der" class="col">
+    <form action="/auth/login" method="POST" class="d-flex flex-column">
+        <div class="input-group mb-3">
+            <span class="input-group-text w-25" id="inputGroup-sizing-default">E-mail</span>
+            <input type="email" class="form-control w-75" name="correo" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+        </div>
+        <div class="input-group mb-3">
+            <span class="input-group-text w-25" id="inputGroup-sizing-default">Password</span>
+            <input type="password" class="form-control w-75" name="contrasena" placeholder="Contraseña" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg" required>
+        </div>
+        <button type="submit" class="btn btn-success mt-2 p-2">Iniciar sesión</button>
+    </form>
+
+    <div class="d-flex flex-column pt-3 gap-3">
+        <a href="/auth/olvido-contrasena" class="btn btn-secondary btn-login p-2">Olvidé la Contraseña</a>
+        <a href="/auth/registrarse" class="btn btn-warning btn-login p-2" style="background-color: #063F71; border: none; color: white;">Registrarse</a>  
+    </div>
+</div>

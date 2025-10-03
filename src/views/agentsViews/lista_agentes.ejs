@@ -1,0 +1,77 @@
+
+    <div class="d-flex justify-content-between">
+        <a href="/agents/magicians" class="btn btn-outline-danger">Volver</a>
+        <a href="/agents/crear-agente" class="btn btn-warning w-25">➕ Crear Agente</a>
+    </div>
+    <div class="d-flex align-items-center flex-column mt-3">
+        <div id="añ-ag-reg" class="fs-3 p-2 fw-bold w-75">👤 Agentes</div>
+        <div class="d-flex flex-column align-items-center w-75 pb-3 pt-2" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+                <table class="w-75 text-center table-auto">
+                    <thead class="bg-gray-100">
+                    <tr>
+                        <th class="border px-4 py-2">Nombre</th>
+                        <th class="border px-4 py-2">Rol</th>
+                        <th class="border px-4 py-2">Estado</th>
+                        <th class="border px-5 py-2">Accion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% agentes.forEach(agente => { %>
+                        <tr>
+                        <td class="border px-4 py-2">
+                            <%= `${agente.primerNombre} ${agente.segundoNombre || ''} ${agente.primerApellido} ${agente.segundoApellido || ''}`.trim() %>
+                        </td>
+                        <td class="border px-4 py-2"><%= agente.rol %></td>
+                        <td class="border px-4 py-2">
+                            <%= agente.estado ? '✅ Activo' : '❌ Inactivo' %>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-warning btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--corporate-mint); outline: none; border: none; color: white;">Opciones</button>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-item" onclick='confirmarEliminacion("<%= agente.id %>")' style="cursor:pointer;">Eliminar</li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li class="dropdown-item" onclick='confirmarCambioEstado("<%= agente.id %>", "<%= agente.estado %>")' style="cursor:pointer;">Cambiar Estado</li>
+                                </ul>
+                            </div>
+                        </td>
+                        </tr>
+                    <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function confirmarEliminacion(id) {
+            Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará al agente permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            window.location.href = `/agents/eliminar/${id}`;
+            }
+        });
+        }
+        
+        function confirmarCambioEstado(id, estadoActual) {
+            const nuevoEstado = estadoActual ? 'inactivo' : 'activo';
+            Swal.fire({
+            title: '¿Cambiar estado?',
+            text: `El agente se marcará como ${nuevoEstado}.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cambiar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            window.location.href = `/agents/cambiar-estado/${id}`;
+        }
+        });
+        }
+        </script>

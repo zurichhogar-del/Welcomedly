@@ -1,0 +1,60 @@
+    <a href="/agents/lista-agentes" class="btn btn-outline-danger">Volver</a>
+    <div class="d-flex align-items-center flex-column">
+        <div id="añ-ag-reg" class="fs-3 p-2 fw-bold w-75">🕵️ Crear agente</div>
+        <div class="d-flex flex-column align-items-center w-75 pt-3 pb-3" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+
+        <form action="/agents/crear-agente" method="POST" class="w-75 d-flex flex-column align-items-center gap-2">
+            <div class="input-group">
+                <label class="input-group-text w-25">Primer Nombre</label>
+                <input type="text" name="primer_nombre" class="form-control" required />
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">Segundo Nombre</label>
+                <input type="text" name="segundo_nombre" class="form-control"/>
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">Primer Apellido</label>
+                <input type="text" name="primer_apellido" class="form-control" required />
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">Segundo Apellido</label>
+                <input type="text" name="segundo_apellido" class="form-control" />
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">No identificacion</label>
+                <input type="text" name="identificacion" class="form-control" required />
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">Correo</label>
+                <input type="email" name="correo" class="form-control" required />
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">Contraseña</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+
+            <div class="input-group">
+                <label class="input-group-text w-25">Contraseña</label>
+                <select name="rol" class="form-select" required>
+                    <option selected disabled>Selecciona un rol</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="AGENTE">Agente</option>
+                </select>
+            </div>
+
+            <div class="w-50 d-flex justify-content-around align-items-center m-4 gap-2">
+                <a href="/agents/lista-agentes" class="btn btn-danger w-50">🗑️ Cancelar</a>
+                <br>
+                <button type="submit" class="btn btn-success w-50" style="background-color: var(--corporate-mint); outline: none; border: none;">💾 Guardar</button>
+            </div>
+
+
+        </form>
+    </div>
+</div>

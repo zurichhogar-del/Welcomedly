@@ -1,0 +1,73 @@
+
+    <div class="d-flex justify-content-end mt-2 gap-3">
+        <a href="/campaign/agregar-registros-enbloque" class="btn btn-outline-secondary me-2">Agregar Registros en Bloque</a>
+        <a href="/campaign/volver-a-llamar" class="btn btn-outline-warning">Volver a llamar</a>
+        <a href="/market/crear-campana" class="btn btn-outline-success" >Crear Campaña</a>
+    </div>
+
+    <div class="d-flex align-items-center flex-column mt-3 w-100">
+        <div id="añ-ag-reg" class="fs-3 p-2 fw-bold">✨ Campañas</div>
+        <div class="d-flex flex-column align-items-center px-5 py-3 w-100" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+            <table class="w-full border border-gray-300 text-sm text-center w-100">
+    <thead class="bg-gray-200">
+    <tr>
+        <th class="p-2 border">Nombre</th>
+        <th class="p-2 border">Registros</th>
+        <th class="p-2 border">Estado</th>
+        <th class="p-2 border">Fecha de creación</th>
+        <th class="p-2 border">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% campanas.forEach(c => { %>
+        <tr class="text-center border-b">
+        <td class="p-2 border"><%= c.nombre %></td>
+        <td class="p-2 border"><%= c.cantidadRegistros %></td>
+        <td class="p-2 border"><%= c.estado ? "✅ Activa" : "❌ Inactiva" %></td>
+        <td class="p-2 border">
+            <%= c.createdAt ? new Date(c.createdAt).toLocaleDateString('es-CO', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) : 'Sin fecha' %>
+        </td>
+        <td class="p-2 border d-flex justify-content-evenly">
+            <a href="/campaign/campanas/<%= c.id %>/ver-base" class="btn btn-warning" style="background-color: var(--corporate-mint); outline: none; border: none; color: white;">Ver base de datos</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-warning btn-md dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--corporate-blue); outline: none; border: none; color: white;">Opciones</button>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-item"><a href="/campaign/campanas/<%= c.id %>/agregar-registro" style="text-decoration: none; color: black;">Agregar Registro</a></li>
+                    <li class="dropdown-item" onclick='confirmarEliminacion("<%= c.id %>")' style="cursor:pointer;">Eliminar</li>
+                </ul>
+            </div>
+            
+        </td>
+        </tr>
+    <% }) %>
+    </tbody>
+</table>
+
+    
+        </div>
+    </div>  
+
+    <script>
+        function confirmarEliminacion(id) {
+            Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción eliminará la campaña permanentemente.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+            window.location.href = `/campaign/campanas/${id}/eliminar`;
+            }
+        });
+        }
+    </script>
+
+
+    </div>
+
