@@ -7,6 +7,7 @@ import Campana from './Campana.js';
 import BaseCampana from './BaseCampana.js';
 import Formulario from './Formulario.js';
 import User from './User.js';
+import Disposicion from './Disposicion.js';
 
 const db = {};
 
@@ -18,6 +19,7 @@ db.Campana = Campana(sequelize, Sequelize.DataTypes);
 db.BaseCampana = BaseCampana(sequelize, Sequelize.DataTypes);
 db.Formulario = Formulario(sequelize, Sequelize.DataTypes);
 db.User = User(sequelize, Sequelize.DataTypes);
+db.Disposicion = Disposicion(sequelize, Sequelize.DataTypes);
 
 
 

@@ -31,7 +31,21 @@ export default (sequelize, DataTypes) => {
         }, {
             tableName: 'campanas', // Nombre explícito de la tabla
             timestamps: true,
-            underscored: true // Opcional: para compatibilidad con snake_case
+            underscored: true, // Opcional: para compatibilidad con snake_case
+            indexes: [
+                // Índice en formularioId
+                {
+                    fields: ['formulario_id']
+                },
+                // Índice en estado para filtrar activas/inactivas
+                {
+                    fields: ['estado']
+                },
+                // Índice en fecha de creación para ordenamiento
+                {
+                    fields: ['created_at']
+                }
+            ]
         });
 
     Campana.associate = (models) => {
@@ -42,6 +56,12 @@ export default (sequelize, DataTypes) => {
         Campana.belongsTo(models.Formulario, {
             foreignKey: 'formularioId',
             as: 'formulario'
+        });
+        Campana.belongsToMany(models.Disposicion, {
+            through: 'campana_disposiciones',
+            foreignKey: 'campana_id',
+            otherKey: 'disposicion_id',
+            as: 'disposiciones'
         });
     };
 

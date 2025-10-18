@@ -1,0 +1,90 @@
+<a href="/disposiciones/lista" class="btn btn-outline-danger">Volver</a>
+
+<div class="d-flex align-items-center flex-column">
+    <div id="añ-ag-reg" class="fs-3 p-2 fw-bold w-75">✏️ Editar Disposición</div>
+    <div class="d-flex flex-column align-items-center w-75 pt-3 pb-3" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+
+        <form action="/disposiciones/editar/<%= disposicion.id %>" method="POST" class="w-75 d-flex flex-column align-items-center gap-3">
+
+            <!-- Nombre de la Disposición -->
+            <div class="input-group">
+                <label class="input-group-text w-25">Nombre</label>
+                <input type="text" name="nombre" class="form-control" value="<%= disposicion.nombre %>" required maxlength="100" />
+            </div>
+
+            <!-- Descripción -->
+            <div class="input-group">
+                <label class="input-group-text w-25">Descripción</label>
+                <textarea name="descripcion" class="form-control" rows="2"><%= disposicion.descripcion || '' %></textarea>
+            </div>
+
+            <!-- Tipo de Disposición -->
+            <div class="input-group">
+                <label class="input-group-text w-25">Tipo</label>
+                <select name="tipo" class="form-select" required>
+                    <option value="EXITOSA" <%= disposicion.tipo === 'EXITOSA' ? 'selected' : '' %>>
+                        ✅ Exitosa (Venta cerrada, Objetivo logrado)
+                    </option>
+                    <option value="NO_CONTACTO" <%= disposicion.tipo === 'NO_CONTACTO' ? 'selected' : '' %>>
+                        📞 No Contacto (No contesta, Ocupado, etc.)
+                    </option>
+                    <option value="SEGUIMIENTO" <%= disposicion.tipo === 'SEGUIMIENTO' ? 'selected' : '' %>>
+                        🔄 Seguimiento (Volver a llamar, Enviar info)
+                    </option>
+                    <option value="NO_EXITOSA" <%= disposicion.tipo === 'NO_EXITOSA' ? 'selected' : '' %>>
+                        ❌ No Exitosa (No interesado, No califica)
+                    </option>
+                </select>
+            </div>
+
+            <!-- Color -->
+            <div class="input-group">
+                <label class="input-group-text w-25">Color</label>
+                <input type="color" name="color" class="form-control form-control-color" value="<%= disposicion.color || '#6c757d' %>" title="Selecciona un color" />
+                <small class="text-muted ms-2">Color para visualización en reportes</small>
+            </div>
+
+            <!-- Requiere Callback -->
+            <div class="form-check d-flex align-items-center gap-2 w-100 justify-content-center">
+                <input type="checkbox" name="requiereCallback" value="true" class="form-check-input" id="requiereCallback"
+                    <%= disposicion.requiereCallback ? 'checked' : '' %> />
+                <label class="form-check-label" for="requiereCallback">
+                    📞 ¿Requiere agendar callback? (Para seguimientos)
+                </label>
+            </div>
+
+            <!-- Estado Activa/Inactiva -->
+            <div class="form-check d-flex align-items-center gap-2 w-100 justify-content-center">
+                <input type="checkbox" name="activa" value="true" class="form-check-input" id="activa"
+                    <%= disposicion.activa ? 'checked' : '' %> />
+                <label class="form-check-label" for="activa">
+                    ✅ Disposición activa (disponible para usar)
+                </label>
+            </div>
+
+            <!-- Orden de visualización -->
+            <div class="input-group">
+                <label class="input-group-text w-25">Orden</label>
+                <input type="number" name="orden" class="form-control" value="<%= disposicion.orden || 0 %>" min="0" />
+                <small class="text-muted ms-2">Orden de aparición en listas (0 = primero)</small>
+            </div>
+
+            <!-- Información de creación -->
+            <div class="alert alert-info w-100 text-center">
+                <small>
+                    <strong>Creada:</strong> <%= new Date(disposicion.createdAt).toLocaleDateString('es-ES') %>
+                    <% if (disposicion.updatedAt) { %>
+                        | <strong>Última actualización:</strong> <%= new Date(disposicion.updatedAt).toLocaleDateString('es-ES') %>
+                    <% } %>
+                </small>
+            </div>
+
+            <!-- Botones -->
+            <div class="w-50 d-flex justify-content-around align-items-center m-4 gap-2">
+                <a href="/disposiciones/lista" class="btn btn-danger w-50">🗑️ Cancelar</a>
+                <button type="submit" class="btn btn-success w-50" style="background-color: var(--corporate-mint); outline: none; border: none;">💾 Guardar Cambios</button>
+            </div>
+
+        </form>
+    </div>
+</div>

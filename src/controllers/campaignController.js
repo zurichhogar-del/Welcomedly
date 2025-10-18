@@ -1,4 +1,5 @@
 import sequelize from '../database/connection.js'
+import campaignService from '../services/campaignService.js'
 
 import db from '../models/index.js'
 const Campana = db.Campana
@@ -187,16 +188,23 @@ export async function mostrarFormularioGestion(req, res) {
     try {
         const { campanaId, registroId } = req.params;
 
-        // 1. Obtener el registro con su campaña y formulario asociado
+        // 1. Obtener el registro con su campaña, formulario y disposición asociada
         const registro = await BaseCampana.findByPk(registroId, {
-            include: [{
-                model: Campana,
-                as: 'campana',
-                include: [{
-                    model: Formulario,
-                    as: 'formulario'
-                }]
-            }]
+            include: [
+                {
+                    model: Campana,
+                    as: 'campana',
+                    include: [{
+                        model: Formulario,
+                        as: 'formulario'
+                    }]
+                },
+                {
+                    model: db.Disposicion,
+                    as: 'disposicion',
+                    required: false
+                }
+            ]
         });
 
         if (!registro) {
@@ -207,7 +215,7 @@ export async function mostrarFormularioGestion(req, res) {
         // 2. Extraer SOLO el campo de tipificación del formulario
         const opcionesTipificacion = registro.campana.formulario.campos || [];
 
-        // 3. Renderizar con los datos específicos
+        // 3. Renderizar con los datos específicos incluyendo disposición y callbacks
         res.render('campaignViews/iniciar_gestion', {
             registro: {
                 ...registro.toJSON(),
@@ -215,7 +223,13 @@ export async function mostrarFormularioGestion(req, res) {
                 nombre: registro.nombre,
                 telefono: registro.telefono,
                 correo: registro.correo,
-                otrosCampos: registro.otrosCampos || {}
+                otrosCampos: registro.otrosCampos || {},
+                // Datos de gestión
+                intentosLlamada: registro.intentosLlamada || 0,
+                ultimaLlamada: registro.ultimaLlamada,
+                disposicion: registro.disposicion,
+                callbackDate: registro.callbackDate,
+                callbackNotas: registro.callbackNotas
             },
             opcionesTipificacion, // Envía solo el campo de tipificación
             campanaId
@@ -229,31 +243,32 @@ export async function mostrarFormularioGestion(req, res) {
 }
 
 export async function guardarGestion(req, res) {
-    const transaction = await sequelize.transaction();
     try {
-        // Asegúrate de capturar ambos parámetros
         const { campanaId, registroId } = req.params;
-        const { tipificacion } = req.body;
+        const { disposicionId, callbackDate, callbackNotas, tipificacion } = req.body;
 
-        if (!tipificacion) {
-            throw new Error("Debes seleccionar una tipificación válida");
+        // Validar que se haya seleccionado una disposición
+        if (!disposicionId) {
+            throw new Error("⚠️ Debes seleccionar una disposición");
         }
 
-        await BaseCampana.update(
-            { tipificacion },
-            { 
-                where: { id: registroId },
-                transaction 
-            }
-        );
+        // Guardar disposición con callback usando el servicio
+        await campaignService.saveDisposicion(registroId, {
+            disposicionId: parseInt(disposicionId),
+            callbackDate: callbackDate || null,
+            callbackNotas: callbackNotas || null
+        });
 
-        await transaction.commit();
-        req.session.mensajeExito = "✅ Tipificación actualizada correctamente";
+        // Si también hay tipificación del formulario, guardarla
+        if (tipificacion) {
+            await campaignService.saveTypification(registroId, tipificacion);
+        }
+
+        req.session.mensajeExito = "✅ Gestión guardada correctamente";
     } catch (error) {
-        await transaction.rollback();
         console.error('Error al guardar gestión:', error);
-        req.session.swalError = error.message || "Error al guardar los cambios";
+        req.session.swalError = error.message || "❌ Error al guardar la gestión";
     }
-    // Redirige usando el campanaId capturado de los parámetros
+
     res.redirect(`/campaign/campanas/${req.params.campanaId}/ver-base`);
 }

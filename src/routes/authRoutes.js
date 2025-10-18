@@ -4,8 +4,9 @@ import {
     mostrarOlvidoContrasena,
     mostrarRegistro,
     loginUsuario,
-    logoutUsuario 
+    logoutUsuario
 } from "../controllers/authController.js";
+import { loginLimiter } from "../middlewares/securityMiddleware.js";
 
 const router = Router();
 
@@ -30,7 +31,7 @@ router.use(soloInvitados);
 
 // Rutas
 router.get("/login", mostrarLogin);
-router.post("/login", loginUsuario);
+router.post("/login", loginLimiter, loginUsuario); // Proteger login con rate limiting
 router.get("/olvido-contrasena", mostrarOlvidoContrasena);
 router.get("/registrarse", mostrarRegistro);
 

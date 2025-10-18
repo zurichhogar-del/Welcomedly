@@ -222,7 +222,7 @@ export const crearCampana = async (req, res) => {
                 Se encontraron ${erroresCSV.length} errores:
                 ${erroresCSV.map(e => `• Línea ${e.línea}: ${e.error}`).join('\n')}
             `;
-            fs.unlinkSync(csvPath);
+            if (fs.existsSync(csvPath)) fs.unlinkSync(csvPath);
             return res.redirect('/market/crear-campana');
         }
 
@@ -241,7 +241,7 @@ export const crearCampana = async (req, res) => {
 
             // Asignación equitativa de registros
             const registrosPorAgente = Math.ceil(registros.length / agentes.length);
-            
+
             for (let i = 0; i < registros.length; i++) {
                 const agenteIndex = Math.floor(i / registrosPorAgente) % agentes.length;
                 await BaseCampana.create({
@@ -252,7 +252,7 @@ export const crearCampana = async (req, res) => {
             }
 
             await transaction.commit();
-            fs.unlinkSync(csvPath); // Limpiar archivo
+            if (fs.existsSync(csvPath)) fs.unlinkSync(csvPath); // Limpiar archivo
             req.session.mensajeExito = `✅ Campaña "${nombre}" creada (${registros.length} contactos)`;
             res.redirect('/campaign/campanas');
 
@@ -265,6 +265,17 @@ export const crearCampana = async (req, res) => {
     } catch (error) {
         console.error('Error:', error.message);
         req.session.swalError = error.message;
+        // Asegurar limpieza del archivo CSV en cualquier error
+        if (archivoCSV?.filename) {
+            const csvPath = path.join(process.cwd(), 'uploads', 'csv', archivoCSV.filename);
+            if (fs.existsSync(csvPath)) {
+                try {
+                    fs.unlinkSync(csvPath);
+                } catch (unlinkError) {
+                    console.error('Error al eliminar archivo CSV:', unlinkError);
+                }
+            }
+        }
         res.redirect('/market/crear-campana');
     }
 };

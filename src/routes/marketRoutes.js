@@ -12,6 +12,7 @@ import {
 } from "../controllers/marketController.js";
 import { asegurarAutenticacion } from "../middlewares/authMiddleware.js";
 import { upload } from '../middlewares/multerMiddleware.js';
+import { createResourceLimiter, uploadLimiter } from '../middlewares/securityMiddleware.js';
 
 const router = Router();
 
@@ -28,12 +29,12 @@ router.use(asegurarAutenticacion, layoutMarket);
 router.get("/market", vistaMarket);
 router.get("/formularios", formularios);
 router.get("/crear-formulario", crearFormulario);
-router.post("/crear-formulario", guardarFormulario);
+router.post("/crear-formulario", createResourceLimiter, guardarFormulario);
 router.get('/formularios/editar/:id', mostrarEditarFormulario);
 router.post('/formularios/editar/:id', actualizarFormulario);
 router.get('/formularios/eliminar/:id', eliminarFormulario);
 router.get('/crear-campana', mostrarFormularioCampana);
-router.post('/crear-campana', upload.single('baseDatos'), crearCampana);
+router.post('/crear-campana', uploadLimiter, upload.single('baseDatos'), crearCampana);
 
 
 export default router;

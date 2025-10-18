@@ -52,6 +52,20 @@ export default (sequelize, DataTypes) => {
         sequelize,
         modelName: "User",
         tableName: "usuarios",
+        indexes: [
+            // Índice en rol para filtrar por tipo de usuario
+            {
+                fields: ['rol']
+            },
+            // Índice en estado para filtrar activos/inactivos
+            {
+                fields: ['estado']
+            },
+            // Índice compuesto rol + estado (consulta común)
+            {
+                fields: ['rol', 'estado']
+            }
+        ],
         hooks: {
             beforeValidate: async (user) => {
                 // Generar username si no existe

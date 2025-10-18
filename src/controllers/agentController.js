@@ -1,5 +1,3 @@
-import bcrypt from 'bcrypt';
-
 import db from '../models/index.js';
 const User = db.User
 
@@ -43,10 +41,7 @@ export async function crearAgente(req, res) {
         return res.redirect('/agents/crear-agente');
     }
 
-        // Hashear la contraseña del formulario
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Crear el usuario con campos exactos como en el modelo
+        // Crear el usuario - El hook beforeCreate hashea automáticamente la contraseña
         await User.create({
             primerNombre: primer_nombre,
             segundoNombre: segundo_nombre,
@@ -55,15 +50,15 @@ export async function crearAgente(req, res) {
             identificacion,
             correo,
             username,
-            contrasena: hashedPassword, // ⬅️ Este nombre debe coincidir con el del modelo
+            contrasena: password, // Se guarda en texto plano, el hook la hashea
             rol
         });
 
-        req.session.mensajeExito = "✅ Formulario actualizado correctamente.";
+        req.session.mensajeExito = "✅ Agente creado exitosamente";
         res.redirect("/agents/lista-agentes");
     } catch (error) {
         console.error('❌ Error al crear el usuario:', error);
-        req.session.swalError = "❌ Error al crear el usuario.";
+        req.session.swalError = "❌ Error al crear el agente";
         res.redirect('/agents/crear-agente');
     }
 }
@@ -95,11 +90,11 @@ export const eliminarAgente = async (req, res) => {
     const { id } = req.params;
     try {
         await User.destroy({ where: { id } });
-        req.session.mensajeExito = "✅ Formulario actualizado correctamente.";
+        req.session.mensajeExito = "✅ Agente eliminado exitosamente";
         res.redirect('/agents/lista-agentes');
     } catch (error) {
-        console.error('❌ Error al listar agentes:', error);
-        req.session.swalError = "❌ Error al listar agentes.";
+        console.error('❌ Error al eliminar agente:', error);
+        req.session.swalError = "❌ Error al eliminar el agente";
         res.redirect('/agents/lista-agentes');
     }
     };
@@ -110,19 +105,19 @@ export const eliminarAgente = async (req, res) => {
         const agente = await User.findByPk(id);
 
     if (!agente) {
-        req.session.swalError = "⚠️ gente no encontrado";
+        req.session.swalError = "⚠️ Agente no encontrado";
         return res.redirect('/agents/lista-agentes');
     }
 
     agente.estado = !agente.estado;
     await agente.save();
 
-        req.session.mensajeExito = "✅ Formulario actualizado correctamente.";
+        req.session.mensajeExito = `✅ Estado del agente actualizado a ${agente.estado ? 'Activo' : 'Inactivo'}`;
         res.redirect('/agents/lista-agentes');
 
     } catch (error) {
-        console.error('❌ Error al listar agentes:', error);
-        req.session.swalError = "❌ Error al listar agentes.";
+        console.error('❌ Error al cambiar estado:', error);
+        req.session.swalError = "❌ Error al cambiar el estado del agente";
         res.redirect('/agents/lista-agentes');
     }
 };

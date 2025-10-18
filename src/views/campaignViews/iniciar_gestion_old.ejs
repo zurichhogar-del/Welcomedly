@@ -1,0 +1,62 @@
+<div class="container mt-4">
+    <a href="/campaign/campanas/<%= campanaId %>/ver-base" class="btn btn-outline-danger mb-3">← Volver</a>
+    
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5>Gestionando: <%= registro.nombre %></h5>
+        </div>
+        
+        <div class="card-body">
+            <!-- Sección 1: Datos del Contacto -->
+            <div class="mb-4">
+                <h6 class="border-bottom pb-2">📌 Información del Contacto</h6>
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Teléfono:</strong> <%= registro.telefono %></p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Email:</strong> <%= registro.correo %></p>
+                    </div>
+                </div>
+                
+                <!-- Campos adicionales dinámicos -->
+                <% if (Object.keys(registro.otrosCampos).length > 0) { %>
+                    <h6 class="mt-3">📝 Datos Adicionales</h6>
+                    <div class="row">
+                        <% Object.entries(registro.otrosCampos).forEach(([key, value]) => { %>
+                            <div class="col-md-4 mb-2">
+                                <strong><%= key %>:</strong> <%= value %>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Sección 2: Formulario de Tipificación SIMPLIFICADO -->
+            <% if (opcionesTipificacion && opcionesTipificacion.length > 0) { %>
+                <form action="/campaign/campanas/<%= campanaId %>/gestionar/<%= registro.id %>" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">🔖 Estado del Contacto</label>
+                        <select class="form-select" name="tipificacion" required>
+                            <option value="">-- Seleccione una opción --</option>
+                            <% opcionesTipificacion.forEach(opcion => { %>
+                                <option value="<%= opcion %>" 
+                                    <%= registro.tipificacion === opcion ? 'selected' : '' %>>
+                                    <%= opcion %>
+                                </option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100 py-2">
+                        💾 Guardar Gestión
+                    </button>
+                </form>
+            <% } else { %>
+                <div class="alert alert-warning">
+                    No hay opciones de tipificación configuradas para este formulario.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

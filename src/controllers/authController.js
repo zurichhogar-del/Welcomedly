@@ -1,80 +1,57 @@
-import bcrypt from 'bcryptjs';
-
-import db from '../models/index.js'; // ✅ Importa todos los modelos correctamente
-const User = db.User;
+import authService from '../services/authService.js';
+import { MESSAGES } from '../config/constants.js';
 
 export function mostrarLogin(req, res) {
     res.render("authViews/login", {
         layout: 'layouts/authLayout',
     });
-} 
+}
+
 export function mostrarOlvidoContrasena(req, res) {
     res.render("authViews/olvido_contraseña", {
         layout: 'layouts/authLayout',
     });
-}  
+}
+
 export function mostrarRegistro(req, res) {
     res.render("authViews/registrarse_nuevo", {
         layout: 'layouts/authLayout',
     });
 }
 
-// NUEVA FUNCIÓN: Procesar login
+/**
+ * Procesar login de usuario
+ */
 export async function loginUsuario(req, res) {
     const { correo, contrasena } = req.body;
 
     try {
-        const usuario = await User.findOne({ 
-            where: { correo }, // Buscar por correo
-            attributes: ['id', 'correo', 'contrasena', 'rol', 'estado']
-        });
+        // Usar servicio de autenticación
+        const usuario = await authService.login(correo, contrasena);
 
-        if (!usuario || !usuario.estado) {
-            req.session.alert = {
-                type: 'error',
-                message: 'Credenciales inválidas'
-            };
-            return res.redirect('/auth/login');
-        }
+        // Crear sesión
+        authService.createSession(req, usuario);
 
-        const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasena);
-        
-        if (!contrasenaValida) {
-            req.session.alert = {
-                type: 'error',
-                message: 'Credenciales inválidas'
-            };
-            return res.redirect('/auth/login');
-        }
-
-        req.session.usuario = {
-            id: usuario.id,
-            correo: usuario.correo, // Guardar correo en sesión
-            rol: usuario.rol
-        };
-        
-        req.session.alert = {
-            type: 'success',
-            message: `Bienvenido ${usuario.username}`
-        };
+        req.session.mensajeExito = MESSAGES.SUCCESS.LOGIN_SUCCESS(usuario.username);
         res.redirect("/market/market");
 
     } catch (error) {
         console.error("Error en login:", error);
-        req.session.alert = {
-            type: 'error',
-            message: 'Error en el servidor'
-        };
+        req.session.swalError = error.message || MESSAGES.ERROR.LOGIN_FAILED;
         res.redirect('/auth/login');
     }
-}   
+}
 
-export function logoutUsuario(req, res) {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error("❌ Error al cerrar sesión:", err);
-            return res.status(500).send("Error al cerrar sesión");
-        }
-        res.redirect("/auth/login"); // Redirige a la vista de login
-    });
+/**
+ * Cerrar sesión de usuario
+ */
+export async function logoutUsuario(req, res) {
+    try {
+        await authService.logout(req);
+        res.redirect("/auth/login");
+    } catch (error) {
+        console.error("❌ Error al cerrar sesión:", error);
+        req.session.swalError = "Error al cerrar sesión";
+        res.redirect("/auth/login");
+    }
 }
