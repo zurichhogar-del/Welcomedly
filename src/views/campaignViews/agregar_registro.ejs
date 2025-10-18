@@ -49,26 +49,49 @@
 </div>
 
 <!-- Script para campos dinámicos -->
-<script>
-document.getElementById('btnAddCampo').addEventListener('click', () => {
-    const container = document.getElementById('camposExtraContainer');
-    const newField = document.createElement('div');
-    newField.className = 'row g-3 mb-2';
-    newField.innerHTML = `
-        <div class="col-md-5">
-            <input type="text" class="form-control" placeholder="Nombre del campo">
-        </div>
-        <div class="col-md-5">
-            <input type="text" class="form-control" placeholder="Valor">
-        </div>
-        <div class="col-md-2">
-            <button type="button" class="btn btn-sm btn-outline-danger w-100 removerCampo">
-                <i class="bi bi-trash">🗑️ Eliminar</i>
-            </button>
-        </div>
-    `;
-    container.appendChild(newField);
-});
+<script type="module">
+    import { createElementSecure } from '/js/sanitize.js';
+
+    document.getElementById('btnAddCampo').addEventListener('click', () => {
+        const container = document.getElementById('camposExtraContainer');
+        const newField = createElementSecure('div', { class: 'row g-3 mb-2' });
+
+        // Crear columna para nombre del campo
+        const colNombre = createElementSecure('div', { class: 'col-md-5' });
+        const inputNombre = createElementSecure('input', {
+            type: 'text',
+            class: 'form-control',
+            placeholder: 'Nombre del campo'
+        });
+        colNombre.appendChild(inputNombre);
+
+        // Crear columna para valor
+        const colValor = createElementSecure('div', { class: 'col-md-5' });
+        const inputValor = createElementSecure('input', {
+            type: 'text',
+            class: 'form-control',
+            placeholder: 'Valor'
+        });
+        colValor.appendChild(inputValor);
+
+        // Crear columna para botón eliminar
+        const colBoton = createElementSecure('div', { class: 'col-md-2' });
+        const boton = createElementSecure('button', {
+            type: 'button',
+            class: 'btn btn-sm btn-outline-danger w-100 removerCampo'
+        });
+
+        const icono = createElementSecure('i', { class: 'bi bi-trash' }, '🗑️ Eliminar');
+        boton.appendChild(icono);
+        colBoton.appendChild(boton);
+
+        // Ensamblar el campo
+        newField.appendChild(colNombre);
+        newField.appendChild(colValor);
+        newField.appendChild(colBoton);
+
+        container.appendChild(newField);
+    });
 
 // Delegación de eventos para botones de eliminar
 document.getElementById('camposExtraContainer').addEventListener('click', (e) => {

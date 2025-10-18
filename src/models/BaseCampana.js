@@ -50,14 +50,14 @@ export default (sequelize, DataTypes) => {
             comment: 'Timestamp del último intento de llamada'
         },
         campanaId: {
-        type: DataTypes.INTEGER,
-        allowNull: false, // No permitir valores nulos
-        references: {
-            model: 'campanas', // Nombre de la tabla en PostgreSQL
-            key: 'id'
-                }
+            type: DataTypes.INTEGER,
+            allowNull: false, // No permitir valores nulos
+            references: {
+                model: 'campanas', // Nombre de la tabla en PostgreSQL
+                key: 'id'
             }
-        }, {
+        }
+    }, {
             underscored: true, // Si usas snake_case en la BD
             indexes: [
                 // Índice en campanaId para consultas frecuentes

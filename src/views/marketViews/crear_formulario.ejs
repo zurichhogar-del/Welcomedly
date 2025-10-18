@@ -3,6 +3,9 @@
         <div id="añ-ag-reg" class="fs-3 p-2 fw-bold w-75">📝 Crear Formulario</div>
         <div class="d-flex flex-column align-items-center w-75" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
             <form action="/market/crear-formulario" method="POST" class="w-75 d-flex flex-column align-items-center">
+                <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <% } %>
 
             <div class="input-group mt-3 w-100">
                 <span class="input-group-text" id="inputGroup-sizing-default">Nombre del Formulario</span>
@@ -27,15 +30,31 @@
 </div>
 
 
-<script>
+<script type="module">
+    import { createElementSecure } from '/js/sanitize.js';
+
     function agregarCampo() {
         const container = document.getElementById('camposContainer');
-        const grupo = document.createElement('div');
-        grupo.className = 'input-group mb-2';
-        grupo.innerHTML = `
-            <input type="text" name="campos[]" class="form-control" placeholder="Nuevo campo" required>
-            <button type="button" class="btn btn-danger" onclick="eliminarCampo(this)">🗑️</button>
-        `;
+        const grupo = createElementSecure('div', { class: 'input-group mb-2' });
+
+        // Crear input de forma segura
+        const input = createElementSecure('input', {
+            type: 'text',
+            name: 'campos[]',
+            class: 'form-control',
+            placeholder: 'Nuevo campo',
+            required: ''
+        });
+
+        // Crear botón de forma segura
+        const boton = createElementSecure('button', {
+            type: 'button',
+            class: 'btn btn-danger',
+            onclick: 'eliminarCampo(this)'
+        }, '🗑️');
+
+        grupo.appendChild(input);
+        grupo.appendChild(boton);
         container.appendChild(grupo);
     }
 

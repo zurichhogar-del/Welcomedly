@@ -36,15 +36,31 @@
 </div>
 
 
-<script>
+<script type="module">
+    import { createElementSecure } from '/js/sanitize.js';
+
     function agregarCampo() {
         const container = document.getElementById('camposContainer');
-        const grupo = document.createElement('div');
-        grupo.className = 'input-group mb-2';
-        grupo.innerHTML = `
-            <input type="text" name="campos[]" class="form-control" placeholder="Nuevo campo" required>
-            <button type="button" class="btn btn-danger" onclick="eliminarCampo(this)">🗑️</button>
-        `;
+        const grupo = createElementSecure('div', { class: 'input-group mb-2' });
+
+        // Crear input de forma segura
+        const input = createElementSecure('input', {
+            type: 'text',
+            name: 'campos[]',
+            class: 'form-control',
+            placeholder: 'Nuevo campo',
+            required: ''
+        });
+
+        // Crear botón de forma segura
+        const boton = createElementSecure('button', {
+            type: 'button',
+            class: 'btn btn-danger',
+            onclick: 'eliminarCampo(this)'
+        }, '🗑️');
+
+        grupo.appendChild(input);
+        grupo.appendChild(boton);
         container.appendChild(grupo);
     }
 

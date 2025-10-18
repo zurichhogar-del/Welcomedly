@@ -1,0 +1,30 @@
+<%
+/**
+ * Generar campo oculto de CSRF para formularios
+ */
+function csrfField() {
+    if (typeof csrfToken !== 'undefined' && csrfToken) {
+        return `<input type="hidden" name="_csrf" value="${csrfToken}">`;
+    }
+    return '';
+}
+
+/**
+ * Generar meta tag para CSRF (para AJAX)
+ */
+function csrfMeta() {
+    if (typeof csrfToken !== 'undefined' && csrfToken) {
+        return `<meta name="csrf-token" content="${csrfToken}">`;
+    }
+    return '';
+}
+
+/**
+ * Obtener token CSRF como string
+ */
+function getCSRFToken() {
+    return typeof csrfToken !== 'undefined' ? csrfToken : '';
+}
+%>
+
+<%= csrfField() %>

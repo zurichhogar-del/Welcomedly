@@ -10,6 +10,11 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+    <!-- CSRF Token -->
+    <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <% } %>
+
     <title>Welcomdly!</title>
 </head>
 
@@ -51,7 +56,19 @@
 </script>
 <% } %>
 
-
+<!-- CSRF Helper -->
+<script type="module" src="/js/csrfHelper.js"></script>
+<script>
+    // Inicializar protección CSRF cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Importar y ejecutar initCSRFProtection
+        import('/js/csrfHelper.js').then(module => {
+            module.initCSRFProtection();
+        }).catch(err => {
+            console.warn('No se pudo cargar el helper CSRF:', err);
+        });
+    });
+</script>
 
 </body>
 </html>

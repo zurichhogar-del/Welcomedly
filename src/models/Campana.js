@@ -4,7 +4,7 @@ export default (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        formularioId: { 
+        formularioId: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -14,7 +14,7 @@ export default (sequelize, DataTypes) => {
         },
         estado: {
             type: DataTypes.BOOLEAN,
-            defaultValue: true 
+            defaultValue: true
         },
         baseDatos: { // Almacenará la ruta del archivo CSV
             type: DataTypes.TEXT,
@@ -23,12 +23,8 @@ export default (sequelize, DataTypes) => {
         agentesAsignados: {
             type: DataTypes.ARRAY(DataTypes.INTEGER),
             allowNull: false
-        },
-        createdAt: {
-                type: DataTypes.DATE,
-                defaultValue: DataTypes.NOW
-            },
-        }, {
+        }
+    }, {
             tableName: 'campanas', // Nombre explícito de la tabla
             timestamps: true,
             underscored: true, // Opcional: para compatibilidad con snake_case

@@ -9,6 +9,7 @@ import morgan from 'morgan';
 import sequelize from './database/connection.js';
 import indexRoutes from './routes/index.js';
 import { helmetConfig, generalLimiter } from './middlewares/securityMiddleware.js';
+import { injectCSRFToken, csrfProtection, secureSessionCookie } from './middlewares/csrfMiddleware.js';
 import { notFoundHandler, errorHandler, sequelizeErrorHandler } from './middlewares/errorMiddleware.js';
 import 'dotenv/config';
 
@@ -66,6 +67,12 @@ app.use(session({
 // Configurar connect-flash
 app.use(flash());
 
+// Middleware de seguridad para sesión
+app.use(secureSessionCookie);
+
+// Middleware para inyectar token CSRF en vistas
+app.use(injectCSRFToken);
+
 // Middleware para mensajes flash
 app.use((req, res, next) => {
     res.locals.swalError = req.session.swalError || req.flash('error')[0] || "";
@@ -79,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  // Pasar session a todas las vistas
+    // Pasar session a todas las vistas
     res.locals.session = req.session;
     next();
 });

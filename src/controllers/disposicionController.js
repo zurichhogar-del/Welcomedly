@@ -16,7 +16,7 @@ export async function mostrarDisposiciones(req, res) {
         res.render('disposiciones/lista-disposiciones', {
             layout: 'layouts/generalLayout',
             disposiciones,
-            usuario: req.session.usuario,
+            usuario: req.user || req.session.usuario,
             mensajeExito: req.session.mensajeExito,
             swalError: req.session.swalError
         });
@@ -38,7 +38,7 @@ export async function mostrarDisposiciones(req, res) {
 export function mostrarFormularioCrear(req, res) {
     res.render('disposiciones/crear-disposicion', {
         layout: 'layouts/generalLayout',
-        usuario: req.session.usuario,
+        usuario: req.user || req.session.usuario,
         swalError: req.session.swalError
     });
 
@@ -82,7 +82,7 @@ export async function mostrarFormularioEditar(req, res) {
         res.render('disposiciones/editar-disposicion', {
             layout: 'layouts/generalLayout',
             disposicion,
-            usuario: req.session.usuario,
+            usuario: req.user || req.session.usuario,
             swalError: req.session.swalError
         });
 

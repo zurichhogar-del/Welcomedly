@@ -143,7 +143,9 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import { sanitizeHtml, escapeHtml } from '/js/sanitize.js';
+
     // Cargar disposiciones disponibles para esta campaña
     async function cargarDisposiciones() {
         try {
@@ -155,8 +157,8 @@
             }
         } catch (error) {
             console.error('Error al cargar disposiciones:', error);
-            document.getElementById('disposicionesContainer').innerHTML =
-                '<div class="alert alert-danger">Error al cargar disposiciones</div>';
+            const container = document.getElementById('disposicionesContainer');
+            container.innerHTML = sanitizeHtml('<div class="alert alert-danger">Error al cargar disposiciones</div>');
         }
     }
 
@@ -182,16 +184,23 @@
         Object.keys(grupos).forEach(tipo => {
             const grupo = grupos[tipo];
             if (grupo.items.length > 0) {
-                html += `<div class="col-12"><h6 class="text-muted mb-2">${grupo.label}</h6></div>`;
+                // Escapar el label para prevenir XSS
+                html += `<div class="col-12"><h6 class="text-muted mb-2">${escapeHtml(grupo.label)}</h6></div>`;
 
                 grupo.items.forEach(disp => {
+                    // Escapar todos los valores dinámicos
+                    const dispId = parseInt(disp.id) || 0;
+                    const dispNombre = escapeHtml(disp.nombre || '');
+                    const dispColor = escapeHtml(disp.color || '#000000');
+                    const requiereCallback = disp.requiereCallback ? 'true' : 'false';
+
                     html += `
                         <div class="col-md-6">
-                            <div class="form-check border rounded p-2 disposicion-option" style="cursor: pointer; transition: all 0.3s;" data-id="${disp.id}" data-callback="${disp.requiereCallback}">
-                                <input class="form-check-input" type="radio" name="disposicion" id="disp_${disp.id}" value="${disp.id}" required>
-                                <label class="form-check-label w-100" for="disp_${disp.id}" style="cursor: pointer;">
-                                    <span style="color: ${disp.color}; font-weight: bold;">●</span>
-                                    ${disp.nombre}
+                            <div class="form-check border rounded p-2 disposicion-option" style="cursor: pointer; transition: all 0.3s;" data-id="${dispId}" data-callback="${requiereCallback}">
+                                <input class="form-check-input" type="radio" name="disposicion" id="disp_${dispId}" value="${dispId}" required>
+                                <label class="form-check-label w-100" for="disp_${dispId}" style="cursor: pointer;">
+                                    <span style="color: ${dispColor}; font-weight: bold;">●</span>
+                                    ${dispNombre}
                                     ${disp.requiereCallback ? '<span class="badge bg-primary ms-1">📞</span>' : ''}
                                 </label>
                             </div>
@@ -202,7 +211,7 @@
         });
 
         html += '</div>';
-        container.innerHTML = html;
+        container.innerHTML = sanitizeHtml(html);
 
         // Agregar event listeners
         document.querySelectorAll('.disposicion-option').forEach(option => {
