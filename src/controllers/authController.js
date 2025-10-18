@@ -26,7 +26,7 @@ export async function loginUsuario(req, res) {
     try {
         const usuario = await User.findOne({ 
             where: { correo }, // Buscar por correo
-            attributes: ['id', 'correo', 'contrasena', 'rol', 'estado']
+            attributes: ['id', 'correo', 'contrasena', 'rol', 'estado', 'status']
         });
 
         if (!usuario || !usuario.estado) {
@@ -47,17 +47,36 @@ export async function loginUsuario(req, res) {
             return res.redirect('/auth/login');
         }
 
+        // Set user session
+        req.session.userId = usuario.id;
         req.session.usuario = {
             id: usuario.id,
-            correo: usuario.correo, // Guardar correo en sesión
+            correo: usuario.correo,
             rol: usuario.rol
         };
         
+        // Update user status to available on login
+        await User.update(
+            { 
+                status: 'available',
+                lastStatusChange: new Date()
+            },
+            { where: { id: usuario.id } }
+        );
+        
         req.session.alert = {
             type: 'success',
-            message: `Bienvenido ${usuario.username}`
+            message: `Bienvenido ${usuario.correo}`
         };
-        res.redirect("/market/market");
+        
+        // Redirect based on role
+        if (usuario.rol === 'ADMIN') {
+            res.redirect("/admin/dashboard");
+        } else if (usuario.rol === 'OPERATIONS') {
+            res.redirect("/operations/dashboard");
+        } else {
+            res.redirect("/market/market");
+        }
 
     } catch (error) {
         console.error("Error en login:", error);
@@ -69,12 +88,34 @@ export async function loginUsuario(req, res) {
     }
 }   
 
-export function logoutUsuario(req, res) {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error("❌ Error al cerrar sesión:", err);
-            return res.status(500).send("Error al cerrar sesión");
+export async function logoutUsuario(req, res) {
+    try {
+        if (req.session.userId) {
+            // Update user status to offline on logout
+            await User.update(
+                { 
+                    status: 'offline',
+                    lastStatusChange: new Date()
+                },
+                { where: { id: req.session.userId } }
+            );
         }
-        res.redirect("/auth/login"); // Redirige a la vista de login
-    });
+        
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("❌ Error al cerrar sesión:", err);
+                return res.status(500).send("Error al cerrar sesión");
+            }
+            res.redirect("/auth/login");
+        });
+    } catch (error) {
+        console.error("Error en logout:", error);
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("❌ Error al cerrar sesión:", err);
+                return res.status(500).send("Error al cerrar sesión");
+            }
+            res.redirect("/auth/login");
+        });
+    }
 }
