@@ -1,0 +1,72 @@
+<%- include('../partials/generalHeader', {pageTitle: 'Panel de Administración'}) %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Panel de Administración</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                                    <h5 class="card-title">Gestión de Usuarios</h5>
+                                    <p class="card-text">Administrar agentes, operadores y personal</p>
+                                    <a href="/agents" class="btn btn-primary">Gestionar Usuarios</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                                    <h5 class="card-title">Reportes</h5>
+                                    <p class="card-text">Ver reportes de productividad y rendimiento</p>
+                                    <a href="/reports" class="btn btn-success">Ver Reportes</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-bullhorn fa-3x text-warning mb-3"></i>
+                                    <h5 class="card-title">Campañas</h5>
+                                    <p class="card-text">Gestionar campañas de llamadas</p>
+                                    <a href="/campaign" class="btn btn-warning">Gestionar Campañas</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-cogs fa-3x text-info mb-3"></i>
+                                    <h5 class="card-title">Operaciones</h5>
+                                    <p class="card-text">Monitoreo en tiempo real de operaciones</p>
+                                    <a href="/operations/dashboard" class="btn btn-info">Panel de Operaciones</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <i class="fas fa-shopping-cart fa-3x text-danger mb-3"></i>
+                                    <h5 class="card-title">Market</h5>
+                                    <p class="card-text">Gestión de formularios y bases de datos</p>
+                                    <a href="/market/market" class="btn btn-danger">Ir a Market</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/generalBody') %>

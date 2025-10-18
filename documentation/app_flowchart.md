@@ -1,0 +1,11 @@
+flowchart TD
+    A[Client browser] --> B[Express server entry point index js]
+    B --> C[Logging middleware using morgan]
+    C --> D[Authentication middleware checks session]
+    D --> E[File upload middleware multer]
+    E --> F[Router dispatches to endpoint]
+    F --> G[Controller handles business logic]
+    G --> H[Models perform ORM operations]
+    H --> I[PostgreSQL database stores data]
+    G --> J[Render view using EJS]
+    G --> K[Send JSON response]
