@@ -1,0 +1,726 @@
+<%- include('../layouts/generalLayout') %>
+
+<div class="container-fluid p-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">
+                        <i class="fas fa-chart-line me-2"></i>Real-time Analytics
+                    </h2>
+                    <p class="text-muted mb-0">Live monitoring dashboard with real-time updates</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="refreshAllMetrics()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                    <button class="btn btn-outline-success" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                        <i class="fas fa-play me-1"></i>Auto Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection Status -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info d-flex align-items-center" id="connectionStatus">
+                <i class="fas fa-circle me-2" id="connectionIndicator"></i>
+                <span id="connectionText">Connecting to real-time service...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="row mb-4">
+        <!-- Campaigns KPI -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Active Campaigns</h6>
+                            <h3 class="mb-0" id="activeCampaigns">-</h3>
+                            <small class="opacity-75">
+                                <span id="campaignsActiveRate">0%</span> active rate
+                            </small>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-white" id="campaignsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agents KPI -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Online Agents</h6>
+                            <h3 class="mb-0" id="onlineAgents">-</h3>
+                            <small class="opacity-75">
+                                <span id="agentsOnlineRate">0%</span> online rate
+                            </small>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-white" id="agentsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calls KPI -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Today's Calls</h6>
+                            <h3 class="mb-0" id="todayCalls">-</h3>
+                            <small class="opacity-75">
+                                <span id="callsSuccessRate">0%</span> success rate
+                            </small>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-white" id="callsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System KPI -->
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-1">Connected Clients</h6>
+                            <h3 class="mb-0" id="connectedClients">-</h3>
+                            <small class="opacity-75">
+                                <span id="activeRooms">0</span> active rooms
+                            </small>
+                        </div>
+                        <div class="fs-1 opacity-50">
+                            <i class="fas fa-wifi"></i>
+                        </div>
+                    </div>
+                    <div class="progress mt-3" style="height: 4px;">
+                        <div class="progress-bar bg-dark" id="clientsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+        <!-- Performance Trends -->
+        <div class="col-lg-8 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Performance Trends
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disposition Distribution -->
+        <div class="col-lg-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Disposition Distribution
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="dispositionChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Activity Feed -->
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-stream me-2"></i>Live Activity Feed
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="activity-feed" id="activityFeed" style="max-height: 400px; overflow-y: auto;">
+                        <div class="text-center p-4 text-muted">
+                            <i class="fas fa-spinner fa-spin me-2"></i>Loading activity...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Metrics -->
+        <div class="col-lg-6 mb-3">
+            <div class="card h-100">
+                <div class="card-header bg-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-server me-2"></i>System Metrics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <div class="metric-item">
+                                <label class="text-muted small">Memory Usage</label>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-primary" id="memoryProgress" style="width: 0%"></div>
+                                </div>
+                                <small class="text-muted" id="memoryText">0 MB</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="metric-item">
+                                <label class="text-muted small">Server Uptime</label>
+                                <div class="h5 mb-0" id="uptimeText">0h 0m</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="metric-item">
+                                <label class="text-muted small">WebSocket Messages</label>
+                                <div class="h5 mb-0" id="messagesCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                            <div class="metric-item">
+                                <label class="text-muted small">Last Update</label>
+                                <div class="h5 mb-0" id="lastUpdate">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.activity-feed {
+    font-size: 0.9rem;
+}
+
+.activity-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #dee2e6;
+    transition: background-color 0.2s;
+}
+
+.activity-item:hover {
+    background-color: #f8f9fa;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.activity-content {
+    flex: 1;
+    margin-left: 12px;
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.metric-item {
+    padding: 8px 0;
+}
+
+#connectionIndicator.connected {
+    color: #28a745;
+    animation: pulse 2s infinite;
+}
+
+#connectionIndicator.disconnected {
+    color: #dc3545;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+</style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Real-time Dashboard JavaScript -->
+<script>
+let ws = null;
+let autoRefresh = false;
+let performanceChart = null;
+let dispositionChart = null;
+let messagesCount = 0;
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    connectWebSocket();
+});
+
+// Initialize Charts
+function initializeCharts() {
+    // Performance Trends Chart
+    const perfCtx = document.getElementById('performanceChart').getContext('2d');
+    performanceChart = new Chart(perfCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Calls',
+                    data: [],
+                    borderColor: '#063F71',
+                    backgroundColor: 'rgba(6, 63, 113, 0.1)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Success Rate %',
+                    data: [],
+                    borderColor: '#00D498',
+                    backgroundColor: 'rgba(0, 212, 152, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false,
+                    }
+                }
+            }
+        }
+    });
+
+    // Disposition Distribution Chart
+    const dispCtx = document.getElementById('dispositionChart').getContext('2d');
+    dispositionChart = new Chart(dispCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Successful', 'No Contact', 'Follow-up', 'Unsuccessful'],
+            datasets: [{
+                data: [0, 0, 0, 0],
+                backgroundColor: [
+                    '#28a745',
+                    '#ffc107',
+                    '#17a2b8',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+}
+
+// Connect to WebSocket
+function connectWebSocket() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        updateConnectionStatus(false, 'No authentication token available');
+        return;
+    }
+
+    const wsUrl = `ws://localhost:3009?token=${token}`;
+
+    try {
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = function() {
+            console.log('WebSocket connected');
+            updateConnectionStatus(true, 'Connected to real-time service');
+            subscribeToEvents();
+        };
+
+        ws.onmessage = function(event) {
+            handleWebSocketMessage(JSON.parse(event.data));
+            messagesCount++;
+            document.getElementById('messagesCount').textContent = messagesCount;
+        };
+
+        ws.onclose = function() {
+            console.log('WebSocket disconnected');
+            updateConnectionStatus(false, 'Connection lost. Attempting to reconnect...');
+            setTimeout(connectWebSocket, 5000);
+        };
+
+        ws.onerror = function(error) {
+            console.error('WebSocket error:', error);
+            updateConnectionStatus(false, 'Connection error');
+        };
+
+    } catch (error) {
+        console.error('Failed to connect WebSocket:', error);
+        updateConnectionStatus(false, 'Failed to connect to real-time service');
+    }
+}
+
+// Update connection status
+function updateConnectionStatus(connected, message) {
+    const indicator = document.getElementById('connectionIndicator');
+    const text = document.getElementById('connectionText');
+    const statusDiv = document.getElementById('connectionStatus');
+
+    if (connected) {
+        indicator.className = 'fas fa-circle me-2 connected';
+        statusDiv.className = 'alert alert-success d-flex align-items-center';
+    } else {
+        indicator.className = 'fas fa-circle me-2 disconnected';
+        statusDiv.className = 'alert alert-warning d-flex align-items-center';
+    }
+
+    text.textContent = message;
+}
+
+// Subscribe to events
+function subscribeToEvents() {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+
+    // Subscribe to metrics updates
+    ws.send(JSON.stringify({
+        type: 'subscribe',
+        data: {
+            event: 'analytics'
+        }
+    }));
+
+    // Subscribe to campaigns updates
+    ws.send(JSON.stringify({
+        type: 'subscribe',
+        data: {
+            event: 'campaigns'
+        }
+    }));
+
+    // Subscribe to agents updates
+    ws.send(JSON.stringify({
+        type: 'subscribe',
+        data: {
+            event: 'agents'
+        }
+    }));
+
+    // Request initial metrics
+    ws.send(JSON.stringify({
+        type: 'get_metrics',
+        data: {
+            metrics: ['campaigns', 'agents', 'calls', 'system'],
+            timeframe: 'realtime'
+        }
+    }));
+}
+
+// Handle WebSocket messages
+function handleWebSocketMessage(message) {
+    switch (message.type) {
+        case 'connection':
+            console.log('Connected to real-time service:', message.data);
+            break;
+
+        case 'initial_data':
+            handleInitialData(message.data);
+            break;
+
+        case 'metrics_update':
+            handleMetricsUpdate(message.data);
+            break;
+
+        case 'metrics_data':
+            handleMetricsData(message.data);
+            break;
+
+        case 'subscription_confirmed':
+            console.log('Subscribed to:', message.data);
+            break;
+
+        case 'activity_update':
+            addActivityItem(message.data);
+            break;
+
+        default:
+            console.log('Unknown message type:', message.type);
+    }
+}
+
+// Handle initial data
+function handleInitialData(data) {
+    if (data.event === 'campaigns') {
+        // Handle initial campaigns data
+    } else if (data.event === 'agents') {
+        // Handle initial agents data
+    }
+}
+
+// Handle metrics update
+function handleMetricsUpdate(data) {
+    const metrics = data.metrics;
+
+    // Update KPIs
+    if (metrics.campaigns) {
+        updateCampaignsKPI(metrics.campaigns.data);
+    }
+
+    if (metrics.agents) {
+        updateAgentsKPI(metrics.agents.data);
+    }
+
+    if (metrics.calls) {
+        updateCallsKPI(metrics.calls.data);
+    }
+
+    if (metrics.system) {
+        updateSystemKPI(metrics.system.data);
+    }
+
+    // Update last update time
+    document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+
+    // Update charts
+    updateCharts(metrics);
+}
+
+// Handle metrics data response
+function handleMetricsData(data) {
+    handleMetricsUpdate({
+        metrics: data.metrics
+    });
+}
+
+// Update Campaigns KPI
+function updateCampaignsKPI(data) {
+    document.getElementById('activeCampaigns').textContent = data.active || 0;
+    document.getElementById('campaignsActiveRate').textContent = data.activeRate || '0%';
+    document.getElementById('campaignsProgress').style.width = (data.activeRate || 0) + '%';
+}
+
+// Update Agents KPI
+function updateAgentsKPI(data) {
+    document.getElementById('onlineAgents').textContent = data.online || 0;
+    document.getElementById('agentsOnlineRate').textContent = data.onlineRate || '0%';
+    document.getElementById('agentsProgress').style.width = (data.onlineRate || 0) + '%';
+}
+
+// Update Calls KPI
+function updateCallsKPI(data) {
+    document.getElementById('todayCalls').textContent = data.today || 0;
+    document.getElementById('callsSuccessRate').textContent = data.successRate || '0%';
+    document.getElementById('callsProgress').style.width = (data.successRate || 0) + '%';
+}
+
+// Update System KPI
+function updateSystemKPI(data) {
+    document.getElementById('connectedClients').textContent = data.connectedClients || 0;
+    document.getElementById('activeRooms').textContent = data.activeRooms || 0;
+
+    // Update memory usage
+    const memoryMB = Math.round((data.memoryUsage?.heapUsed || 0) / 1024 / 1024);
+    const memoryTotal = Math.round((data.memoryUsage?.heapTotal || 0) / 1024 / 1024);
+    const memoryPercent = memoryTotal > 0 ? (memoryMB / memoryTotal * 100).toFixed(1) : 0;
+
+    document.getElementById('memoryProgress').style.width = memoryPercent + '%';
+    document.getElementById('memoryText').textContent = `${memoryMB} MB / ${memoryTotal} MB`;
+
+    // Update uptime
+    const uptime = data.uptime || 0;
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    document.getElementById('uptimeText').textContent = `${hours}h ${minutes}m`;
+}
+
+// Update charts
+function updateCharts(metrics) {
+    const now = new Date().toLocaleTimeString();
+
+    // Update performance chart
+    if (performanceChart && metrics.calls) {
+        const calls = metrics.calls.data.today || 0;
+        const successRate = parseFloat(metrics.calls.data.successRate) || 0;
+
+        // Keep only last 20 data points
+        if (performanceChart.data.labels.length > 20) {
+            performanceChart.data.labels.shift();
+            performanceChart.data.datasets[0].data.shift();
+            performanceChart.data.datasets[1].data.shift();
+        }
+
+        performanceChart.data.labels.push(now);
+        performanceChart.data.datasets[0].data.push(calls);
+        performanceChart.data.datasets[1].data.push(successRate);
+        performanceChart.update('none');
+    }
+
+    // Update disposition chart (mock data for now)
+    if (dispositionChart && metrics.calls) {
+        const total = metrics.calls.data.total || 1;
+        const successful = metrics.calls.data.successful || 0;
+
+        dispositionChart.data.datasets[0].data = [
+            successful,
+            Math.floor(total * 0.2),
+            Math.floor(total * 0.15),
+            Math.floor(total * 0.1)
+        ];
+        dispositionChart.update('none');
+    }
+}
+
+// Add activity item
+function addActivityItem(data) {
+    const feed = document.getElementById('activityFeed');
+
+    // Remove loading message if exists
+    const loading = feed.querySelector('.text-center');
+    if (loading) {
+        loading.remove();
+    }
+
+    const item = document.createElement('div');
+    item.className = 'activity-item d-flex align-items-start';
+
+    const iconClass = getActivityIcon(data.type);
+    const iconColor = getActivityColor(data.type);
+
+    item.innerHTML = `
+        <div class="activity-icon ${iconColor}">
+            <i class="fas ${iconClass}"></i>
+        </div>
+        <div class="activity-content">
+            <div class="fw-medium">${data.title || 'System Activity'}</div>
+            <div class="text-muted small">${data.description || 'Activity detected'}</div>
+            <div class="activity-time">${new Date().toLocaleTimeString()}</div>
+        </div>
+    `;
+
+    feed.insertBefore(item, feed.firstChild);
+
+    // Keep only last 50 items
+    while (feed.children.length > 50) {
+        feed.removeChild(feed.lastChild);
+    }
+}
+
+// Get activity icon
+function getActivityIcon(type) {
+    const icons = {
+        'call': 'fa-phone',
+        'campaign': 'fa-bullhorn',
+        'agent': 'fa-user',
+        'system': 'fa-cog',
+        'disposition': 'fa-tags'
+    };
+    return icons[type] || 'fa-info-circle';
+}
+
+// Get activity color
+function getActivityColor(type) {
+    const colors = {
+        'call': 'bg-info text-white',
+        'campaign': 'bg-primary text-white',
+        'agent': 'bg-success text-white',
+        'system': 'bg-warning text-dark',
+        'disposition': 'bg-secondary text-white'
+    };
+    return colors[type] || 'bg-light text-dark';
+}
+
+// Refresh all metrics
+function refreshAllMetrics() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'get_metrics',
+            data: {
+                metrics: ['campaigns', 'agents', 'calls', 'system'],
+                timeframe: 'realtime'
+            }
+        }));
+    }
+}
+
+// Toggle auto refresh
+function toggleAutoRefresh() {
+    autoRefresh = !autoRefresh;
+    const btn = document.getElementById('autoRefreshBtn');
+
+    if (autoRefresh) {
+        btn.innerHTML = '<i class="fas fa-pause me-1"></i>Pause';
+        btn.className = 'btn btn-success';
+
+        // Enable auto refresh by just keeping the WebSocket connection
+        // Metrics are already being pushed automatically
+    } else {
+        btn.innerHTML = '<i class="fas fa-play me-1"></i>Auto Refresh';
+        btn.className = 'btn btn-outline-success';
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (ws) {
+        ws.close();
+    }
+});
+</script>

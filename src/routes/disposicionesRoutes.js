@@ -18,6 +18,7 @@ import {
 } from '../controllers/disposicionController.js';
 import { asegurarAutenticacion } from '../middlewares/authMiddleware.js';
 import { createResourceLimiter } from '../middlewares/securityMiddleware.js';
+import { validate, validateParams, disposicionSchema, idParamSchema } from '../validators/schemas.js';
 
 const router = express.Router();
 
@@ -42,32 +43,31 @@ router.get('/crear', mostrarFormularioCrear);
  * POST /disposiciones/crear
  * Crear nueva disposición
  */
-// router.post('/crear', createResourceLimiter, crearDisposicion); // Temporalmente desactivado
-router.post('/crear', crearDisposicion);
+router.post('/crear', createResourceLimiter, validate(disposicionSchema), crearDisposicion);
 
 /**
  * GET /disposiciones/editar/:id
  * Formulario de edición
  */
-router.get('/editar/:id', mostrarFormularioEditar);
+router.get('/editar/:id', validateParams(idParamSchema), mostrarFormularioEditar);
 
 /**
  * POST /disposiciones/editar/:id
  * Actualizar disposición
  */
-router.post('/editar/:id', actualizarDisposicion);
+router.post('/editar/:id', validateParams(idParamSchema), validate(disposicionSchema), actualizarDisposicion);
 
 /**
  * POST /disposiciones/eliminar/:id
  * Eliminar disposición
  */
-router.post('/eliminar/:id', eliminarDisposicion);
+router.post('/eliminar/:id', validateParams(idParamSchema), eliminarDisposicion);
 
 /**
  * POST /disposiciones/toggle/:id
  * Cambiar estado activo/inactivo
  */
-router.post('/toggle/:id', toggleEstado);
+router.post('/toggle/:id', validateParams(idParamSchema), toggleEstado);
 
 // ========== API (JSON) ==========
 

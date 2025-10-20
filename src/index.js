@@ -46,8 +46,40 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('combined'));
 }
 
-// Rate limiting general (temporalmente desactivado)
-// app.use(generalLimiter);
+// Rutas para PWA y APIs estáticas (PRIMERO - antes de middlewares que interfieran)
+app.get('/manifest.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/manifest+json');
+    res.sendFile(join(__dirname, 'public', 'manifest.json'));
+});
+
+app.get('/sw.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Service-Worker-Allowed', '/');
+    res.sendFile(join(__dirname, 'public', 'sw.js'));
+});
+
+// Ruta para Chrome DevTools (evita errores 404 en consola)
+app.get('/.well-known/appspecific/com.chrome.devtools.json', (req, res) => {
+    res.status(204).end(); // 204 No Content - respuesta vacía exitosa
+});
+
+// Rate limiting general (versión mejorada compatible)
+// import advancedSecurity from './middlewares/advancedSecurity.js'; // Desactivado temporalmente
+
+// Rate limiting mejorado con detección de IP robusta
+app.use((req, res, next) => {
+    // Asegurar que req.ip esté disponible para rate limiting
+    if (!req.ip && req.socket && req.socket.remoteAddress) {
+        req.ip = req.socket.remoteAddress;
+    }
+    if (!req.ip && req.connection && req.connection.remoteAddress) {
+        req.ip = req.connection.remoteAddress;
+    }
+    next();
+});
+
+// Middleware de seguridad enterprise (desactivado temporalmente por compatibilidad)
+// app.use(advancedSecurity.inputSanitization());
 
 // Middlewares básicos
 app.use(express.static(join(__dirname, 'public')));

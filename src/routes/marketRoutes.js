@@ -13,6 +13,7 @@ import {
 import { asegurarAutenticacion } from "../middlewares/authMiddleware.js";
 import { upload } from '../middlewares/multerMiddleware.js';
 import { createResourceLimiter, uploadLimiter } from '../middlewares/securityMiddleware.js';
+import { validate, validateParams, formularioSchema, campanaSchema, idParamSchema } from '../validators/schemas.js';
 
 const router = Router();
 
@@ -29,14 +30,12 @@ router.use(asegurarAutenticacion, layoutMarket);
 router.get("/market", vistaMarket);
 router.get("/formularios", formularios);
 router.get("/crear-formulario", crearFormulario);
-// router.post("/crear-formulario", createResourceLimiter, guardarFormulario); // Temporalmente desactivado
-router.post("/crear-formulario", guardarFormulario);
-router.get('/formularios/editar/:id', mostrarEditarFormulario);
-router.post('/formularios/editar/:id', actualizarFormulario);
-router.get('/formularios/eliminar/:id', eliminarFormulario);
+router.post("/crear-formulario", createResourceLimiter, validate(formularioSchema), guardarFormulario);
+router.get('/formularios/editar/:id', validateParams(idParamSchema), mostrarEditarFormulario);
+router.post('/formularios/editar/:id', validateParams(idParamSchema), validate(formularioSchema), actualizarFormulario);
+router.get('/formularios/eliminar/:id', validateParams(idParamSchema), eliminarFormulario);
 router.get('/crear-campana', mostrarFormularioCampana);
-// router.post('/crear-campana', uploadLimiter, upload.single('baseDatos'), crearCampana); // Temporalmente desactivado
-router.post('/crear-campana', upload.single('baseDatos'), crearCampana);
+router.post('/crear-campana', uploadLimiter, upload.single('baseDatos'), validate(campanaSchema), crearCampana);
 
 
 export default router;

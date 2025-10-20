@@ -1,4 +1,4 @@
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import db from '../models/index.js';
 import { MESSAGES } from '../config/constants.js';
 

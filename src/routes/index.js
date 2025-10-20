@@ -8,7 +8,10 @@ import reportsRoutes from './reportsRoutes.js'
 import agentsRoutes from './agentsRoutes.js'
 import disposicionesRoutes from './disposicionesRoutes.js'
 import aiRoutes from './aiRoutes.js'
-import { csrfProtection } from '../middlewares/csrfMiddleware.js' 
+import { csrfProtection } from '../middlewares/csrfMiddleware.js'
+
+// Importar authJwtRoutes (comentado temporalmente hasta que esté implementado)
+// import authJwtRoutes from './authJwtRoutes.js' 
 
 const router = Router();
 
@@ -31,6 +34,10 @@ router.get("/", (req, res) => {
     }
 });
 
+// Rutas de autenticación (antes de CSRF protection)
+router.use("/auth", authRoutes)
+// router.use("/api/auth", authJwtRoutes) // Comentado temporalmente
+
 // Aplicar protección CSRF a todas las rutas excepto autenticación
 router.use("/chat", chatRoutes)
 router.use(csrfProtection); // Middleware CSRF para las siguientes rutas
@@ -40,6 +47,5 @@ router.use("/reports", reportsRoutes)
 router.use("/agents", agentsRoutes)
 router.use("/disposiciones", disposicionesRoutes)
 router.use("/ai", aiRoutes)
-// Las rutas de auth no llevan CSRF protection para permitir login/registro
 
 export default router;

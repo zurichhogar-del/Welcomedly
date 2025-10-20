@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+src/_archive
+src/public/js/lib
+*.min.js
+*.min.css
+package-lock.json
+.env

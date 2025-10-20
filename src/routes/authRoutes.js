@@ -7,6 +7,7 @@ import {
     logoutUsuario
 } from "../controllers/authController.js";
 import { loginLimiter } from "../middlewares/securityMiddleware.js";
+import { validate, loginSchema } from "../validators/schemas.js";
 
 const router = Router();
 
@@ -31,8 +32,7 @@ router.use(soloInvitados);
 
 // Rutas
 router.get("/login", mostrarLogin);
-// router.post("/login", loginLimiter, loginUsuario); // Proteger login con rate limiting (temporalmente desactivado)
-router.post("/login", loginUsuario);
+router.post("/login", loginLimiter, validate(loginSchema), loginUsuario);
 router.get("/olvido-contrasena", mostrarOlvidoContrasena);
 router.get("/registrarse", mostrarRegistro);
 
