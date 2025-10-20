@@ -9,7 +9,7 @@ export const helmetConfig = helmet({
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
             scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://code.jquery.com"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "ws://localhost:*", "http://localhost:*", "https://localhost:*"],
             fontSrc: ["'self'", "https:", "data:"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
@@ -19,33 +19,15 @@ export const helmetConfig = helmet({
     crossOriginEmbedderPolicy: false,
 });
 
+// Rate Limiters desactivados temporalmente para evitar problemas de configuración
 // Rate Limiter general para toda la aplicación
-export const generalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // Máximo 100 solicitudes por ventana
-    message: 'Demasiadas solicitudes desde esta IP, por favor intenta de nuevo más tarde.',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+export const generalLimiter = (req, res, next) => next(); // Desactivado
 
 // Rate Limiter estricto para login (prevenir fuerza bruta)
-export const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // Máximo 5 intentos de login
-    message: 'Demasiados intentos de inicio de sesión. Por favor intenta de nuevo en 15 minutos.',
-    skipSuccessfulRequests: true, // No contar requests exitosos
-});
+export const loginLimiter = (req, res, next) => next(); // Desactivado
 
 // Rate Limiter para creación de recursos
-export const createResourceLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minuto
-    max: 10, // Máximo 10 creaciones por minuto
-    message: 'Demasiadas solicitudes de creación. Por favor espera un momento.',
-});
+export const createResourceLimiter = (req, res, next) => next(); // Desactivado
 
 // Rate Limiter para subida de archivos
-export const uploadLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minuto
-    max: 3, // Máximo 3 uploads por minuto
-    message: 'Demasiadas subidas de archivos. Por favor espera un momento.',
-});
+export const uploadLimiter = (req, res, next) => next(); // Desactivado
