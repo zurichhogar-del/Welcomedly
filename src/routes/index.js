@@ -12,12 +12,23 @@ import { csrfProtection } from '../middlewares/csrfMiddleware.js'
 
 const router = Router();
 
-// Ruta raíz - redirigir al login
+// Ruta raíz - landing page
 router.get("/", (req, res) => {
-    if (req.session && req.session.usuario) {
-        return res.redirect('/market/market');
+    try {
+        console.log('Accediendo a ruta raíz');
+        if (req.session && req.session.usuario) {
+            console.log('Usuario autenticado, redirigiendo a market');
+            return res.redirect('/market/market');
+        }
+        console.log('Renderizando landing page');
+        res.render('landing', {
+            layout: false,
+            title: 'Welcomedly - Plataforma de Gestión de Call Center'
+        });
+    } catch (error) {
+        console.error('Error en ruta raíz:', error);
+        res.status(500).send('Error interno del servidor: ' + error.message);
     }
-    return res.redirect('/auth/login');
 });
 
 // Aplicar protección CSRF a todas las rutas excepto autenticación

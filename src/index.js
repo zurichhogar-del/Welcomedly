@@ -91,6 +91,24 @@ app.use((req, res, next) => {
     next();
 });
 
+// Ruta raíz antes de otros middlewares para evitar conflictos
+app.get("/", (req, res) => {
+    try {
+        console.log('Accediendo a ruta raíz directa');
+        if (req.session && req.session.usuario) {
+            console.log('Usuario autenticado, redirigiendo a market');
+            return res.redirect('/market/market');
+        }
+        console.log('Renderizando landing page directa');
+        res.render('landing', {
+            layout: false,
+            title: 'Welcomedly - Plataforma de Gestión de Call Center'
+        });
+    } catch (error) {
+        console.error('Error en ruta raíz directa:', error);
+        res.status(500).send('Error interno del servidor: ' + error.message);
+    }
+});
 
 // Rutas
 app.use(indexRoutes);
@@ -108,8 +126,9 @@ app.use(errorHandler);
 async function iniciarServidor() {
     try {
         await sequelize.authenticate();
-        await sequelize.sync({ alter: process.env.NODE_ENV !== 'production' });
-        
+        // No ejecutar sync para evitar errores de constraints
+        console.log('✅ Base de datos conectada correctamente');
+
         const PORT = process.env.PORT || 3000;
         app.listen(PORT, () => {
             console.log(`🚀 Servidor en http://localhost:${PORT}`);
