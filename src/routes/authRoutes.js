@@ -31,7 +31,8 @@ router.use(soloInvitados);
 
 // Rutas
 router.get("/login", mostrarLogin);
-router.post("/login", loginLimiter, loginUsuario); // Proteger login con rate limiting
+// router.post("/login", loginLimiter, loginUsuario); // Proteger login con rate limiting (temporalmente desactivado)
+router.post("/login", loginUsuario);
 router.get("/olvido-contrasena", mostrarOlvidoContrasena);
 router.get("/registrarse", mostrarRegistro);
 

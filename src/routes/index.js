@@ -7,6 +7,7 @@ import chatRoutes from './chatRoutes.js'
 import reportsRoutes from './reportsRoutes.js'
 import agentsRoutes from './agentsRoutes.js'
 import disposicionesRoutes from './disposicionesRoutes.js'
+import aiRoutes from './aiRoutes.js'
 import { csrfProtection } from '../middlewares/csrfMiddleware.js' 
 
 const router = Router();
@@ -27,6 +28,7 @@ router.use("/campaign", campaignsRoutes)
 router.use("/reports", reportsRoutes)
 router.use("/agents", agentsRoutes)
 router.use("/disposiciones", disposicionesRoutes)
+router.use("/ai", aiRoutes)
 // Las rutas de auth no llevan CSRF protection para permitir login/registro
 
 export default router;

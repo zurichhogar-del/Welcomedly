@@ -10,7 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Backend:** Node.js with Express 5, ES Modules
 - **Database:** PostgreSQL with Sequelize ORM
 - **Frontend:** EJS templates, Bootstrap 5, jQuery, SweetAlert2
-- **Security:** Helmet, rate limiting, session-based auth
+- **Security:** Helmet, rate limiting, session-based auth, CSRF protection, XSS prevention
+- **AI Integration:** OpenAI API for agent assistance features
+- **Development Tools:** CodeGuide CLI for documentation and task management
 
 ## Development Commands
 
@@ -29,6 +31,12 @@ node src/database/seedTestData.js
 
 # Run FASE 4 validation tests
 ./test-fase4.sh
+
+# CodeGuide documentation management
+codeguide --help
+codeguide agent:create [name]    # Create new agent documentation
+codeguide task:create [name]     # Create task documentation
+codeguide status                 # Show current status
 ```
 
 ## Architecture
@@ -127,6 +135,57 @@ The dispositions system tracks call outcomes and manages callbacks:
 - `disposicionService.getActivasDisposiciones()`: Active only
 - `campaignService.saveDisposicion(registroId, data)`: Save disposition + callback
 
+### AI Agent Service
+
+The AI Agent Service provides intelligent assistance to call center agents using OpenAI API:
+
+**Features:**
+- **Call Summaries**: Automatically generate call summaries from transcript data
+- **Response Suggestions**: Get AI-powered suggested responses based on customer context
+- **Customer Analysis**: Extract and analyze customer information for better service
+
+**Service Methods:**
+- `aiService.generateCallSummary(callData)`: Generate call summary from transcript
+- `aiService.suggestResponses(context, customerMessage)`: Get response suggestions
+- `aiService.lookupCustomerInfo(customerInfo, query)`: Analyze customer data
+- `aiService.isConfigured()`: Check if OpenAI is properly configured
+
+**Usage Pattern:**
+```javascript
+// In controller
+const result = await aiService.generateCallSummary({
+    customerName: 'John Doe',
+    callDuration: '5:23',
+    keyPoints: ['interested in product X', 'concern about price'],
+    outcome: 'follow-up required'
+});
+```
+
+**Configuration:**
+Add to `.env` file:
+```
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-3.5-turbo
+OPENAI_MAX_TOKENS=500
+```
+
+### Security Enhancements
+
+**XSS Protection:**
+- DOMPurify integration for HTML sanitization (`src/public/js/sanitize.js`)
+- Automatic sanitization of user inputs in forms and displays
+- Configurable allowed tags and attributes for different contexts
+
+**CSRF Protection:**
+- Token-based CSRF protection for all state-changing requests
+- Secure token generation and validation (`src/middlewares/csrfMiddleware.js`)
+- Automatic token injection in forms via EJS
+
+**Secure Session Management:**
+- HttpOnly cookies with secure flag in production
+- Session-based authentication with proper timeout
+- Flash message system with automatic cleanup
+
 ### Error Handling
 
 **Middleware Chain:** `sequelizeErrorHandler` → `errorHandler` → `notFoundHandler`
@@ -146,6 +205,9 @@ PostgreSQL database name: `miappdb`
 **Environment Variables Required:**
 - `DB_PASSWORD`: PostgreSQL password
 - `SESSION_SECRET`: Session encryption key (generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
+- `OPENAI_API_KEY`: OpenAI API key for AI features (optional)
+- `OPENAI_MODEL`: OpenAI model to use (default: gpt-3.5-turbo)
+- `OPENAI_MAX_TOKENS`: Maximum tokens for AI responses (default: 500)
 
 **Schema Sync:** Sequelize auto-syncs on startup (development). For production, use migrations.
 
@@ -228,3 +290,29 @@ export default new ExampleService();
 
 **Issue:** "Column 'id' is ambiguous" in Sequelize queries with COUNT and joins.
 **Fix:** Qualify column with table alias: `db.sequelize.col('TableAlias.id')`
+
+**Issue:** Rate limiting middleware causing "undefined request.ip" errors.
+**Fix:** Temporarily disable rate limiting during development or configure trust proxy.
+
+**Issue:** CSRF token validation failures in AJAX requests.
+**Fix:** Include token in request headers: `headers: { 'X-CSRF-Token': csrfToken }`
+
+## CodeGuide Integration
+
+The project includes CodeGuide CLI for enhanced development workflow:
+
+**Available Commands:**
+- `codeguide agent:create [name]` - Create documentation for new AI agents
+- `codeguide task:create [name]` - Create task-specific documentation
+- `codeguide status` - Show current development status and tasks
+
+**Documentation Files:**
+- `AGENTS.md` - AI agent implementation guides and patterns
+- `TASKS.md` - Task-specific documentation and workflows
+- `CodeGuide` configuration in project root
+
+**Benefits:**
+- Standardized documentation patterns
+- Task tracking and status management
+- AI development best practices
+- Consistent code organization across features

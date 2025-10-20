@@ -42,7 +42,8 @@ router.get('/crear', mostrarFormularioCrear);
  * POST /disposiciones/crear
  * Crear nueva disposición
  */
-router.post('/crear', createResourceLimiter, crearDisposicion);
+// router.post('/crear', createResourceLimiter, crearDisposicion); // Temporalmente desactivado
+router.post('/crear', crearDisposicion);
 
 /**
  * GET /disposiciones/editar/:id

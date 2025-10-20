@@ -8,7 +8,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import sequelize from './database/connection.js';
 import indexRoutes from './routes/index.js';
-import { helmetConfig, generalLimiter } from './middlewares/securityMiddleware.js';
+import { helmetConfig } from './middlewares/securityMiddleware.js';
 import { injectCSRFToken, csrfProtection, secureSessionCookie } from './middlewares/csrfMiddleware.js';
 import { notFoundHandler, errorHandler, sequelizeErrorHandler } from './middlewares/errorMiddleware.js';
 import 'dotenv/config';
@@ -46,8 +46,8 @@ if (process.env.NODE_ENV !== 'production') {
     app.use(morgan('combined'));
 }
 
-// Rate limiting general
-app.use(generalLimiter);
+// Rate limiting general (temporalmente desactivado)
+// app.use(generalLimiter);
 
 // Middlewares básicos
 app.use(express.static(join(__dirname, 'public')));

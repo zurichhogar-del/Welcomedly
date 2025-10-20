@@ -1,0 +1,339 @@
+<%- include('../partials/generalHeader') %>
+
+<div id="gestion" class="d-flex justify-content-around">
+    <%- include('../partials/generalCard') %>
+
+    <div id="contenedorCentral" class="flex-grow-1">
+        <div id="añ-ag-reg" class="fs-3 p-2 fw-bold w-75">🤖 Asistente IA</div>
+        <div class="d-flex flex-column align-items-center w-75" style="background-color: var(--light-grey); border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;">
+
+            <!-- Estado del Servicio AI -->
+            <div class="alert alert-info w-75 mt-3" id="ai-status">
+                <strong>🔍 Verificando estado del servicio AI...</strong>
+            </div>
+
+            <!-- Sección de Resumen de Llamada -->
+            <div class="card w-75 mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">📝 Generar Resumen de Llamada</h5>
+                </div>
+                <div class="card-body">
+                    <form id="call-summary-form">
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label">Nombre del Cliente</label>
+                            <input type="text" class="form-control" id="customerName" name="customerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="campaignName" class="form-label">Campaña</label>
+                            <input type="text" class="form-control" id="campaignName" name="campaignName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="callDuration" class="form-label">Duración de la Llamada</label>
+                            <input type="text" class="form-control" id="callDuration" name="callDuration" placeholder="Ej: 5 minutos">
+                        </div>
+                        <div class="mb-3">
+                            <label for="disposition" class="form-label">Disposición</label>
+                            <input type="text" class="form-control" id="disposition" name="disposition" placeholder="Ej: Venta exitosa">
+                        </div>
+                        <div class="mb-3">
+                            <label for="callNotes" class="form-label">Notas de la Llamada</label>
+                            <textarea class="form-control" id="callNotes" name="callNotes" rows="3" placeholder="Detalles importantes de la conversación..."></textarea>
+                        </div>
+                        <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <% } %>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm d-none" id="summary-spinner"></span>
+                            📋 Generar Resumen
+                        </button>
+                    </form>
+                    <div id="summary-result" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Sección de Sugerencias de Respuesta -->
+            <div class="card w-75 mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">💬 Sugerir Respuestas</h5>
+                </div>
+                <div class="card-body">
+                    <form id="response-suggestions-form">
+                        <div class="mb-3">
+                            <label for="context" class="form-label">Contexto de la Conversación</label>
+                            <textarea class="form-control" id="context" name="context" rows="3" placeholder="Describe la situación actual..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerMessage" class="form-label">Mensaje del Cliente</label>
+                            <textarea class="form-control" id="customerMessage" name="customerMessage" rows="2" placeholder="¿Qué dijo el cliente?" required></textarea>
+                        </div>
+                        <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <% } %>
+                        <button type="submit" class="btn btn-success">
+                            <span class="spinner-border spinner-border-sm d-none" id="suggestions-spinner"></span>
+                            🤔 Obtener Sugerencias
+                        </button>
+                    </form>
+                    <div id="suggestions-result" class="mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Sección de Información de Cliente -->
+            <div class="card w-75 mt-3 mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">🔍 Analizar Información del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <form id="customer-info-form">
+                        <div class="mb-3">
+                            <label for="customerInfoName" class="form-label">Nombre del Cliente</label>
+                            <input type="text" class="form-control" id="customerInfoName" name="customerInfoName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerInfoEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="customerInfoEmail" name="customerInfoEmail">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerInfoPhone" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="customerInfoPhone" name="customerInfoPhone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerCampaign" class="form-label">Campaña Actual</label>
+                            <input type="text" class="form-control" id="customerCampaign" name="customerCampaign">
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerQuery" class="form-label">Consulta Específica (opcional)</label>
+                            <textarea class="form-control" id="customerQuery" name="customerQuery" rows="2" placeholder="¿Qué información específica necesitas?"></textarea>
+                        </div>
+                        <% if (typeof csrfToken !== 'undefined' && csrfToken) { %>
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <% } %>
+                        <button type="submit" class="btn btn-info">
+                            <span class="spinner-border spinner-border-sm d-none" id="info-spinner"></span>
+                            🔎 Analizar Cliente
+                        </button>
+                    </form>
+                    <div id="info-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Assistant JavaScript -->
+<script type="module">
+    import { fetchWithCSRF } from '/js/csrfHelper.js';
+
+    // Verificar estado del servicio AI al cargar la página
+    document.addEventListener('DOMContentLoaded', checkAIStatus);
+
+    async function checkAIStatus() {
+        try {
+            const response = await fetch('/ai/api/status');
+            const data = await response.json();
+
+            const statusDiv = document.getElementById('ai-status');
+            if (data.success) {
+                if (data.configured) {
+                    statusDiv.className = 'alert alert-success w-75 mt-3';
+                    statusDiv.innerHTML = `
+                        <strong>✅ Servicio AI Activo</strong><br>
+                        <small>Modelo: ${data.model} | Tokens máximos: ${data.maxTokens}</small>
+                    `;
+                } else {
+                    statusDiv.className = 'alert alert-warning w-75 mt-3';
+                    statusDiv.innerHTML = `
+                        <strong>⚠️ Servicio AI no configurado</strong><br>
+                        <small>Configure OPENAI_API_KEY en el archivo .env</small>
+                    `;
+                }
+            } else {
+                statusDiv.className = 'alert alert-danger w-75 mt-3';
+                statusDiv.innerHTML = '<strong>❌ Error al verificar estado del servicio AI</strong>';
+            }
+        } catch (error) {
+            console.error('Error checking AI status:', error);
+            document.getElementById('ai-status').className = 'alert alert-danger w-75 mt-3';
+            document.getElementById('ai-status').innerHTML = '<strong>❌ Error de conexión con el servicio AI</strong>';
+        }
+    }
+
+    // Manejar formulario de resumen de llamada
+    document.getElementById('call-summary-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const spinner = document.getElementById('summary-spinner');
+        const resultDiv = document.getElementById('summary-result');
+        const submitButton = e.target.querySelector('button[type="submit"]');
+
+        // Mostrar loading
+        spinner.classList.remove('d-none');
+        submitButton.disabled = true;
+        resultDiv.innerHTML = '<div class="alert alert-info">🔄 Generando resumen...</div>';
+
+        try {
+            const formData = new FormData(e.target);
+            const callData = {
+                customerName: formData.get('customerName'),
+                campaignName: formData.get('campaignName'),
+                duration: formData.get('callDuration'),
+                disposition: formData.get('disposition'),
+                notes: formData.get('callNotes')
+            };
+
+            const response = await fetchWithCSRF('/ai/api/call-summary', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ callData })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>📋 Resumen Generado</strong>
+                        <p class="mb-1">${data.summary}</p>
+                        <small class="text-muted">Tokens usados: ${data.tokensUsed}</small>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ ${data.message}</strong>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>❌ Error al generar resumen</strong>
+                </div>
+            `;
+        } finally {
+            spinner.classList.add('d-none');
+            submitButton.disabled = false;
+        }
+    });
+
+    // Manejar formulario de sugerencias de respuesta
+    document.getElementById('response-suggestions-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const spinner = document.getElementById('suggestions-spinner');
+        const resultDiv = document.getElementById('suggestions-result');
+        const submitButton = e.target.querySelector('button[type="submit"]');
+
+        // Mostrar loading
+        spinner.classList.remove('d-none');
+        submitButton.disabled = true;
+        resultDiv.innerHTML = '<div class="alert alert-info">🔄 Generando sugerencias...</div>';
+
+        try {
+            const formData = new FormData(e.target);
+
+            const response = await fetchWithCSRF('/ai/api/suggest-responses', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    context: formData.get('context'),
+                    customerMessage: formData.get('customerMessage')
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.suggestions.length > 0) {
+                let suggestionsHtml = '<div class="alert alert-success"><strong>💬 Sugerencias:</strong><ul class="mb-1">';
+                data.suggestions.forEach((suggestion, index) => {
+                    suggestionsHtml += `<li>${suggestion}</li>`;
+                });
+                suggestionsHtml += '</ul>';
+                suggestionsHtml += `<small class="text-muted">Tokens usados: ${data.tokensUsed}</small></div>`;
+                resultDiv.innerHTML = suggestionsHtml;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ ${data.message || 'No se pudieron generar sugerencias'}</strong>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error generating suggestions:', error);
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>❌ Error al generar sugerencias</strong>
+                </div>
+            `;
+        } finally {
+            spinner.classList.add('d-none');
+            submitButton.disabled = false;
+        }
+    });
+
+    // Manejar formulario de información de cliente
+    document.getElementById('customer-info-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const spinner = document.getElementById('info-spinner');
+        const resultDiv = document.getElementById('info-result');
+        const submitButton = e.target.querySelector('button[type="submit"]');
+
+        // Mostrar loading
+        spinner.classList.remove('d-none');
+        submitButton.disabled = true;
+        resultDiv.innerHTML = '<div class="alert alert-info">🔄 Analizando información...</div>';
+
+        try {
+            const formData = new FormData(e.target);
+            const customerInfo = {
+                name: formData.get('customerInfoName'),
+                email: formData.get('customerInfoEmail'),
+                phone: formData.get('customerInfoPhone'),
+                campaign: formData.get('customerCampaign')
+            };
+            const query = formData.get('customerQuery');
+
+            const response = await fetchWithCSRF('/ai/api/customer-info', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ customerInfo, query })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        <strong>🔍 Análisis del Cliente</strong>
+                        <p class="mb-1">${data.info}</p>
+                        <small class="text-muted">Tokens usados: ${data.tokensUsed}</small>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ ${data.message}</strong>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error analyzing customer info:', error);
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>❌ Error al analizar información del cliente</strong>
+                </div>
+            `;
+        } finally {
+            spinner.classList.add('d-none');
+            submitButton.disabled = false;
+        }
+    });
+</script>
