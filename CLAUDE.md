@@ -29,7 +29,18 @@ node src/database/seedDisposiciones.js
 # Seed test data (creates campaign, forms, and sample records)
 node src/database/seedTestData.js
 
-# Run FASE 4 validation tests
+# Testing
+npm test                      # Run all Jest tests
+npm run test:watch           # Run tests in watch mode
+npm run test:coverage        # Run tests with coverage report
+
+# Code quality
+npm run lint                 # Check ESLint rules
+npm run lint:fix             # Fix auto-fixable ESLint issues
+npm run format               # Format code with Prettier
+npm run format:check         # Check Prettier formatting
+
+# FASE 4 validation tests (comprehensive testing)
 ./test-fase4.sh
 
 # CodeGuide documentation management
@@ -209,6 +220,9 @@ PostgreSQL database name: `miappdb`
 - `OPENAI_MODEL`: OpenAI model to use (default: gpt-3.5-turbo)
 - `OPENAI_MAX_TOKENS`: Maximum tokens for AI responses (default: 500)
 
+**Environment Setup:**
+Copy `.env.example` to `.env` and configure the required variables. The application will validate critical environment variables on startup and exit if missing.
+
 **Schema Sync:** Sequelize auto-syncs on startup (development). For production, use migrations.
 
 **Note on Sequelize Queries:** When using COUNT with joins, qualify column names with table alias to avoid ambiguity:
@@ -236,11 +250,13 @@ PostgreSQL database name: `miappdb`
 **Adding Sidebar Menu Item:**
 Edit `src/views/partials/generalCard.ejs` and add within `<nav id="top-lat-bar">`:
 ```html
-<a href="/new-route" style="text-decoration: none;" class="d-flex flex-column...">
+<a href="/new-route" style="text-decoration: none;" class="d-flex flex-column justify-content-center align-items-center flex-grow-1 gap-1 h-100">
     <img src="/images/icon.svg" alt="Feature" class="img-fluid m-0">
     <p class="m-1">Label</p>
 </a>
 ```
+
+**Existing Menu Items:** Market, Magicians, Campañas, Disposiciones, Reportes (Agentes/Campañas), Asistente IA
 
 ### Service Layer Example
 
@@ -297,6 +313,25 @@ export default new ExampleService();
 **Issue:** CSRF token validation failures in AJAX requests.
 **Fix:** Include token in request headers: `headers: { 'X-CSRF-Token': csrfToken }`
 
+## Code Quality Tools
+
+**Jest Testing Framework:**
+- Test configuration: `jest.config.js`
+- Test files location: `tests/**/*.test.js`
+- Coverage reports: Generated in `coverage/` directory
+- Current tests: Authentication schemas and services (16 tests passing)
+
+**ESLint Configuration:**
+- Config file: `eslint.config.js`
+- Modern flat config format with Prettier integration
+- Rules include ES6+, async/await, and Node.js best practices
+- Current status: 87 issues (42 errors, 45 warnings) - use `npm run lint:fix`
+
+**Prettier Configuration:**
+- Config file: `.prettierrc`
+- Style: 4 spaces, single quotes, trailing commas
+- Current status: 48 files need formatting - use `npm run format`
+
 ## CodeGuide Integration
 
 The project includes CodeGuide CLI for enhanced development workflow:
@@ -316,3 +351,29 @@ The project includes CodeGuide CLI for enhanced development workflow:
 - Task tracking and status management
 - AI development best practices
 - Consistent code organization across features
+
+## Current Project Status
+
+**Code Quality:**
+- ✅ Jest tests: 16/16 passing
+- ⚠️ ESLint issues: 87 problems (42 errors, 45 warnings)
+- ⚠️ Prettier formatting: 48 files need formatting
+
+**FASE 4 Implementation:**
+- ✅ Dispositions system with 4 types (EXITOSA, NO_CONTACTO, SEGUIMIENTO, NO_EXITOSA)
+- ✅ Callback scheduling functionality
+- ✅ Test validation suite (test-fase4.sh)
+- ✅ Database seeded with 15 dispositions and sample data
+
+**Security Features:**
+- ✅ Helmet.js with CSP configuration
+- ✅ Express-rate-limit with multiple tiers
+- ✅ CSRF protection with token injection
+- ✅ XSS prevention with DOMPurify
+- ✅ Secure session management
+
+**AI Integration:**
+- ✅ OpenAI API service implementation
+- ✅ Call summary generation
+- ✅ Response suggestions
+- ⚠️ Requires OPENAI_API_KEY in environment
