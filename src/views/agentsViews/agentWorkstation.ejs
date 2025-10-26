@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <title>Mi Estación de Trabajo - Welcomedly</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/agent-workstation.css">
+    <!-- Softphone CSS - Sprint 3.1.4 -->
+    <link rel="stylesheet" href="/css/softphone.css">
+</head>
+<body class="agent-workstation" data-agent-id="<%= session.usuario.id %>" data-agent-name="<%= session.usuario.nombre %>">
+
+    <!-- Layout principal -->
+    <%- include('../layouts/generalLayout', {pageTitle: 'Mi Estación de Trabajo'}) %>
+
+    <!-- Contenido principal -->
+    <main class="container-fluid">
+        <div class="row">
+            <!-- Panel de Estado y Control -->
+            <div class="col-md-3">
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Estado Actual</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Estado actual -->
+                        <div class="status-display mb-3">
+                            <div class="status-indicator">
+                                <span class="status-dot" id="status-dot"></span>
+                                <strong id="current-status">Desconectado</strong>
+                            </div>
+                            <div class="status-reason" id="status-reason"></div>
+                        </div>
+
+                        <!-- Controles de estado -->
+                        <div class="status-controls">
+                            <div class="mb-2">
+                                <button class="btn btn-success w-100" data-status="available" id="btn-available">
+                                    <i class="fas fa-check-circle me-2"></i>Disponible
+                                </button>
+                            </div>
+
+                            <div class="mb-2">
+                                <button class="btn btn-warning w-100" data-status="on_pause" id="btn-pause">
+                                    <i class="fas fa-pause-circle me-2"></i>Pausa
+                                </button>
+                            </div>
+
+                            <div class="mb-2">
+                                <button class="btn btn-secondary w-100" data-status="offline" id="btn-offline">
+                                    <i class="fas fa-power-off me-2"></i>Desconectar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Selector de pausa -->
+                        <div class="pause-controls" id="pause-controls" style="display: none;">
+                            <label class="form-label">Tipo de Pausa:</label>
+                            <select class="form-select mb-2" id="pause-type">
+                                <option value="bathroom">Baño</option>
+                                <option value="break">Break</option>
+                                <option value="lunch">Almuerzo</option>
+                                <option value="coaching">Coaching</option>
+                                <option value="system_issue">Problemas Técnicos</option>
+                                <option value="personal">Personal</option>
+                            </select>
+
+                            <label class="form-label">Razón (opcional):</label>
+                            <textarea class="form-control mb-2" id="pause-reason" rows="2"
+                                placeholder="Describe el motivo de tu pausa..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contador de Tiempo -->
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Contadores</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tiempo Productivo -->
+                        <div class="timer-display mb-3">
+                            <label class="form-label">Tiempo Productivo:</label>
+                            <div class="timer-value">
+                                <i class="fas fa-play-circle text-success me-2"></i>
+                                <span id="productive-timer">00:00:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Tiempo en Pausa -->
+                        <div class="timer-display mb-3">
+                            <label class="form-label">Tiempo en Pausa:</label>
+                            <div class="timer-value">
+                                <i class="fas fa-pause-circle text-warning me-2"></i>
+                                <span id="pause-timer">00:00:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Tiempo Total -->
+                        <div class="timer-display">
+                            <label class="form-label">Tiempo Total:</label>
+                            <div class="timer-value">
+                                <i class="fas fa-clock text-primary me-2"></i>
+                                <span id="work-time">00:00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Métricas del Día -->
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Métricas del Día</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-item mb-2">
+                            <i class="fas fa-phone text-primary me-2"></i>
+                            <span>Llamadas:</span>
+                            <span class="metric-value" id="calls-count">0</span>
+                        </div>
+
+                        <div class="metric-item mb-2">
+                            <i class="fas fa-phone-volume text-success me-2"></i>
+                            <span>Contestadas:</span>
+                            <span class="metric-value" id="calls-answered">0</span>
+                        </div>
+
+                        <div class="metric-item mb-2">
+                            <i class="fas fa-percentage text-info me-2"></i>
+                            <span>Tasa Respuesta:</span>
+                            <span class="metric-value" id="answer-rate">0%</span>
+                        </div>
+
+                        <div class="metric-item mb-2">
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            <span>Duración Promedio:</span>
+                            <span class="metric-value" id="avg-duration">00:00</span>
+                        </div>
+
+                        <div class="metric-item mb-2">
+                            <i class="fas fa-shopping-cart text-success me-2"></i>
+                            <span>Ventas:</span>
+                            <span class="metric-value" id="sales-count">0</span>
+                        </div>
+
+                        <div class="metric-item mb-2">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            <span>Calidad:</span>
+                            <span class="metric-value" id="quality-score">0%</span>
+                        </div>
+
+                        <div class="metric-item">
+                            <i class="fas fa-smile text-info me-2"></i>
+                            <span>Satisfacción:</span>
+                            <span class="metric-value" id="satisfaction-score">0.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Principal de Trabajo -->
+            <div class="col-md-9">
+                <!-- Panel de Cliente Actual -->
+                <div class="card mb-3" id="customer-panel" style="display: none;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>Información del Cliente</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="customer-info">
+                                    <h6>Nombre:</h6>
+                                    <p id="customer-name" class="fw-bold">-</p>
+
+                                    <h6>Teléfono:</h6>
+                                    <p id="customer-phone" class="fw-bold">-</p>
+
+                                    <h6>Última Interacción:</h6>
+                                    <p id="customer-last-interaction">-</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="customer-history">
+                                    <h6>Historial de Contactos:</h6>
+                                    <div id="customer-contact-history">
+                                        <!-- Se llenará dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Llamada Activa -->
+                <div class="card mb-3" id="call-panel" style="display: none;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-phone-volume me-2"></i>Llamada Activa</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="call-controls text-center mb-3">
+                            <button class="btn btn-success btn-lg me-2" id="btn-answer">
+                                <i class="fas fa-phone"></i> Contestar
+                            </button>
+                            <button class="btn btn-danger btn-lg me-2" id="btn-hangup">
+                                <i class="fas fa-phone-slash"></i> Colgar
+                            </button>
+                            <button class="btn btn-warning btn-lg" id="btn-hold">
+                                <i class="fas fa-pause"></i> Esperar
+                            </button>
+                            <button class="btn btn-info btn-lg" id="btn-transfer">
+                                <i class="fas fa-exchange-alt"></i> Transferir
+                            </button>
+                        </div>
+
+                        <div class="call-metrics">
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <i class="fas fa-clock text-primary"></i>
+                                    <div id="call-duration">00:00</div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <i class="fas fa-signal text-success"></i>
+                                    <div id="call-quality">Excelente</div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <i class="fas fa-volume-up text-warning"></i>
+                                    <div id="call-volume">75%</div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <i class="fas fa-headphones text-info"></i>
+                                    <div id="call-device">Altavoz</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Asistente IA -->
+                <div class="card mb-3">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Asistente IA</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="ai-suggestions mb-3">
+                            <h6>Sugerencias en Tiempo Real:</h6>
+                            <div id="ai-suggestions" class="alert alert-info">
+                                <!-- Se llenará dinámicamente con sugerencias IA -->
+                                <div class="suggestion-item">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    Menciona nuestro soporte 24/7 disponible
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ai-sentiment mb-3">
+                            <h6>Análisis de Sentimiento:</h6>
+                            <div class="sentiment-bar">
+                                <div class="sentiment-positive" style="width: 75%"></div>
+                                <span class="sentiment-label">Positivo (75%)</span>
+                            </div>
+                        </div>
+
+                        <div class="ai-actions">
+                            <h6>Acciones Sugeridas:</h6>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-handshake me-1"></i>Ofrecer upgrade
+                                </button>
+                                <button class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-tag me-1"></i>Aplicar descuento
+                                </button>
+                                <button class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-book me-1"></i>Buscar conocimiento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Disposiciones -->
+                <div class="card mb-3" id="disposition-panel" style="display: none;">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Disposición de Llamada</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="disposition-form">
+                            <div class="mb-3">
+                                <label class="form-label">Seleccionar Disposición:</label>
+                                <select class="form-select" id="disposition-select">
+                                    <option value="">-- Seleccionar --</option>
+                                    <!-- Se cargarán dinámicamente -->
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Notas de la Llamada:</label>
+                                <textarea class="form-control" id="disposition-notes" rows="4"
+                                    placeholder="Detalla el resultado de la llamada..."></textarea>
+                            </div>
+
+                            <div class="mb-3" id="callback-section" style="display: none;">
+                                <h6>Programar Callback:</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Fecha:</label>
+                                        <input type="date" class="form-control" id="callback-date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Hora:</label>
+                                        <input type="time" class="form-control" id="callback-time">
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label">Notas del Callback:</label>
+                                    <textarea class="form-control" id="callback-notes" rows="2"
+                                        placeholder="Motivo del callback..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button class="btn btn-success btn-lg" id="btn-save-disposition">
+                                    <i class="fas fa-save me-2"></i>Guardar Disposición
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner-border text-primary mb-2" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <div class="loading-text">Procesando...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/csrfHelper.js"></script>
+    <script src="/js/sanitize.js"></script>
+    <!-- SIP.js Library - Sprint 3.1.4 -->
+    <script src="https://cdn.jsdelivr.net/npm/sip.js@0.21.2/dist/sip.min.js"></script>
+    <!-- Softphone Modules - Sprint 3.1.4 & 3.1.5 -->
+    <script type="module" src="/js/softphone.js"></script>
+    <script type="module" src="/js/softphone-ui.js"></script>
+    <script type="module" src="/js/softphone-agent-integration.js"></script>
+    <script src="/js/agentWorkstation.js"></script>
+
+    <script>
+        // Variables globales para el template
+        window.CURRENT_AGENT = {
+            id: <%= session.usuario.id %>,
+            name: "<%= session.usuario.nombre %>",
+            role: "<%= session.usuario.rol %>"
+        };
+
+        // Inicializar cuando el documento esté listo
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Agente Workstation cargado');
+            console.log('👤 Usuario:', window.CURRENT_AGENT);
+
+            // Aquí se puede agregar inicialización adicional
+            if (window.agentWorkstation) {
+                console.log('✅ Sistema de workstation inicializado');
+            } else {
+                console.error('❌ No se pudo inicializar el sistema de workstation');
+            }
+
+            // Sprint 3.1.4 & 3.1.5: Inicializar Softphone WebRTC con integración de estados
+            try {
+                console.log('📞 Inicializando Softphone WebRTC...');
+
+                // Importar módulos (ya cargados como módulos ES6)
+                const { default: WelcomedlySoftphone } = await import('/js/softphone.js');
+                const { default: SoftphoneUI } = await import('/js/softphone-ui.js');
+                const { default: SoftphoneAgentIntegration } = await import('/js/softphone-agent-integration.js');
+
+                // Crear instancia del softphone
+                const softphone = new WelcomedlySoftphone();
+
+                // Crear instancia del UI
+                const softphoneUI = new SoftphoneUI(softphone);
+
+                // Inicializar
+                await softphoneUI.init();
+
+                // Sprint 3.1.5: Crear integración con estados de agente
+                const agentIntegration = new SoftphoneAgentIntegration(softphone, window.CURRENT_AGENT.id);
+
+                // Configurar duración de ACW (30 segundos por defecto)
+                agentIntegration.setACWDuration(30);
+
+                // Guardar en window para acceso global
+                window.softphone = softphone;
+                window.softphoneUI = softphoneUI;
+                window.softphoneAgentIntegration = agentIntegration;
+
+                console.log('✅ Softphone WebRTC inicializado correctamente');
+                console.log('✅ Integración con estados de agente configurada');
+
+                // Sprint 3.2.5: Agregar funcionalidad al botón de transferencia
+                const btnTransfer = document.getElementById('btn-transfer');
+                if (btnTransfer) {
+                    btnTransfer.addEventListener('click', async function() {
+                        try {
+                            // Verificar que hay una llamada activa
+                            if (!window.softphone || !window.softphone.currentSession) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Sin llamada activa',
+                                    text: 'No hay ninguna llamada activa para transferir'
+                                });
+                                return;
+                            }
+
+                            // Obtener el channel de la llamada activa
+                            const currentChannel = window.softphone.currentSession.channel || 'PJSIP/agent-temp';
+
+                            // Mostrar modal para seleccionar destino de transferencia
+                            const { value: formValues } = await Swal.fire({
+                                title: 'Transferir Llamada',
+                                html: `
+                                    <div class="mb-3">
+                                        <label for="transfer-extension" class="form-label">Extensión destino:</label>
+                                        <input type="text" id="transfer-extension" class="form-control" placeholder="Ej: 1002">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de transferencia:</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="transferType" id="transfer-cold" value="cold" checked>
+                                            <label class="form-check-label" for="transfer-cold">
+                                                <strong>Transferencia Ciega (Cold)</strong><br>
+                                                <small class="text-muted">Transfiere inmediatamente sin hablar con el destino</small>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mt-2">
+                                            <input class="form-check-input" type="radio" name="transferType" id="transfer-warm" value="warm">
+                                            <label class="form-check-label" for="transfer-warm">
+                                                <strong>Transferencia Asistida (Warm)</strong><br>
+                                                <small class="text-muted">Permite hablar con el destino antes de transferir</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                `,
+                                focusConfirm: false,
+                                showCancelButton: true,
+                                confirmButtonText: '<i class="fas fa-exchange-alt"></i> Transferir',
+                                cancelButtonText: 'Cancelar',
+                                confirmButtonColor: '#17a2b8',
+                                preConfirm: () => {
+                                    const extension = document.getElementById('transfer-extension').value;
+                                    const transferType = document.querySelector('input[name="transferType"]:checked').value;
+
+                                    if (!extension || extension.trim() === '') {
+                                        Swal.showValidationMessage('Por favor ingresa una extensión válida');
+                                        return false;
+                                    }
+
+                                    return { extension: extension.trim(), transferType };
+                                }
+                            });
+
+                            if (formValues) {
+                                const { extension, transferType } = formValues;
+
+                                // Mostrar indicador de carga
+                                Swal.fire({
+                                    title: 'Transfiriendo...',
+                                    text: `Transfiriendo llamada a extensión ${extension}`,
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                                // Llamar al API de transferencia
+                                const response = await fetch('/api/telephony/call/transfer', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        channel: currentChannel,
+                                        targetExtension: extension,
+                                        transferType: transferType
+                                    })
+                                });
+
+                                const data = await response.json();
+
+                                if (data.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Transferencia exitosa!',
+                                        text: `Llamada transferida a extensión ${extension}`,
+                                        timer: 3000
+                                    });
+                                } else {
+                                    throw new Error(data.message || 'Error al transferir llamada');
+                                }
+                            }
+                        } catch (error) {
+                            console.error('[Transfer] Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error en transferencia',
+                                text: error.message || 'No se pudo completar la transferencia'
+                            });
+                        }
+                    });
+
+                    console.log('✅ Botón de transferencia configurado');
+                }
+
+            } catch (error) {
+                console.error('❌ Error al inicializar Softphone:', error);
+            }
+        });
+    </script>
+
+    <!-- Estilos específicos de la página -->
+    <style>
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-available .status-dot {
+            background-color: #28a745;
+        }
+
+        .status-in_call .status-dot {
+            background-color: #17a2b8;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-on_pause .status-dot {
+            background-color: #ffc107;
+        }
+
+        .status-offline .status-dot {
+            background-color: #6c757d;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .timer-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .sentiment-bar {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+
+        .sentiment-positive {
+            background-color: #28a745;
+            border-radius: 10px;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .sentiment-label {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</body>
+</html>

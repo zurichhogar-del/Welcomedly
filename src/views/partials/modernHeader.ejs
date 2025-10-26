@@ -1,0 +1,165 @@
+<%
+/**
+ * Modern Header - Sprint 3.0
+ * Top navigation with search, notifications, and user menu
+ */
+
+const user = locals.usuario || {};
+const userName = user.nombre || 'Usuario';
+%>
+
+<!-- Header -->
+<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 flex-shrink-0">
+    <!-- Left Section: Mobile Menu + Search -->
+    <div class="flex items-center gap-4 flex-1">
+        <!-- Mobile Menu Toggle -->
+        <button id="mobile-menu-toggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Page Title (visible on mobile) -->
+        <h1 class="text-lg font-semibold text-gray-900 md:hidden">
+            <%= typeof title !== 'undefined' ? title : 'Welcomedly' %>
+        </h1>
+
+        <!-- Search Bar (hidden on mobile) -->
+        <div class="hidden md:flex items-center flex-1 max-w-md">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input
+                    type="text"
+                    placeholder="Buscar..."
+                    class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                >
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Section: Actions + User Menu -->
+    <div class="flex items-center gap-2">
+        <!-- Dark Mode Toggle -->
+        <button id="dark-mode-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Cambiar tema">
+            <svg class="w-5 h-5 text-gray-600 dark-mode-icon-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+            <svg class="w-5 h-5 text-gray-600 dark-mode-icon-dark hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+        </button>
+
+        <!-- Notifications -->
+        <div class="relative">
+            <button id="notifications-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors relative" title="Notificaciones">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-error-500 rounded-full"></span>
+            </button>
+
+            <!-- Notifications Dropdown (hidden by default) -->
+            <div id="notifications-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Notificaciones</h3>
+                        <%- include('../components/badge', { text: '3 nuevas', variant: 'error', size: 'sm' }) %>
+                    </div>
+                </div>
+                <div class="max-h-96 overflow-y-auto scrollbar-thin">
+                    <div class="p-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors">
+                        <div class="flex gap-3">
+                            <div class="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">Nueva campaña asignada</p>
+                                <p class="text-xs text-gray-500 mt-1">Campaña "Ventas Q4" está lista</p>
+                                <p class="text-xs text-gray-400 mt-1">Hace 5 minutos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 hover:bg-gray-50 border-b border-gray-100 cursor-pointer transition-colors">
+                        <div class="flex gap-3">
+                            <div class="w-2 h-2 bg-success-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">Objetivo alcanzado</p>
+                                <p class="text-xs text-gray-500 mt-1">Has completado 50 llamadas hoy</p>
+                                <p class="text-xs text-gray-400 mt-1">Hace 1 hora</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 hover:bg-gray-50 cursor-pointer transition-colors">
+                        <div class="flex gap-3">
+                            <div class="w-2 h-2 bg-warning-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">Recordatorio de capacitación</p>
+                                <p class="text-xs text-gray-500 mt-1">Sesión de entrenamiento mañana a las 10:00 AM</p>
+                                <p class="text-xs text-gray-400 mt-1">Hace 2 horas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-3 border-t border-gray-200">
+                    <button class="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium">
+                        Ver todas las notificaciones
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Menu -->
+        <div class="relative">
+            <button id="header-user-menu-toggle" class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white font-semibold text-sm">
+                    <%= userName.charAt(0).toUpperCase() %>
+                </div>
+                <span class="hidden md:inline text-sm font-medium text-gray-700"><%= userName %></span>
+                <svg class="hidden md:inline w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+
+            <!-- User Dropdown (hidden by default) -->
+            <div id="header-user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                <div class="p-3 border-b border-gray-200">
+                    <p class="text-sm font-medium text-gray-900"><%= userName %></p>
+                    <p class="text-xs text-gray-500 mt-0.5"><%= user.correo || 'usuario@welcomedly.com' %></p>
+                </div>
+                <div class="py-2">
+                    <a href="/perfil" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        Mi Perfil
+                    </a>
+                    <a href="/configuracion" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Configuración
+                    </a>
+                    <a href="/ayuda" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Ayuda
+                    </a>
+                </div>
+                <div class="border-t border-gray-200 py-2">
+                    <form action="/auth/logout" method="POST">
+                        <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 text-sm text-error-600 hover:bg-error-50 transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            Cerrar Sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

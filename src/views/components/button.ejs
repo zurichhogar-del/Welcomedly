@@ -1,0 +1,93 @@
+<%
+/**
+ * Button Component - Sprint 3.0
+ *
+ * Reusable button component with multiple variants
+ *
+ * Props:
+ * - variant: 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'outline' | 'ghost' (default: 'primary')
+ * - size: 'sm' | 'md' | 'lg' (default: 'md')
+ * - type: 'button' | 'submit' | 'reset' (default: 'button')
+ * - disabled: boolean (default: false)
+ * - fullWidth: boolean (default: false)
+ * - icon: string (optional) - Icon HTML or class
+ * - iconPosition: 'left' | 'right' (default: 'left')
+ * - text: string - Button text
+ * - onclick: string (optional) - onClick handler
+ * - href: string (optional) - If provided, renders as anchor
+ * - id: string (optional) - Button ID
+ * - classes: string (optional) - Additional CSS classes
+ *
+ * Usage:
+ * <%- include('components/button', {
+ *   variant: 'primary',
+ *   text: 'Click Me',
+ *   onclick: 'handleClick()'
+ * }) %>
+ */
+
+// Set defaults
+const variant = locals.variant || 'primary';
+const size = locals.size || 'md';
+const type = locals.type || 'button';
+const disabled = locals.disabled || false;
+const fullWidth = locals.fullWidth || false;
+const icon = locals.icon || '';
+const iconPosition = locals.iconPosition || 'left';
+const text = locals.text || 'Button';
+const onclick = locals.onclick || '';
+const href = locals.href || '';
+const id = locals.id || '';
+const additionalClasses = locals.classes || '';
+
+// Build variant classes
+const variantClasses = {
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    success: 'btn-success',
+    warning: 'btn-warning',
+    error: 'btn-error',
+    outline: 'btn-outline',
+    ghost: 'btn-ghost'
+};
+
+// Build size classes
+const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg'
+};
+
+// Build final classes
+let btnClasses = `btn ${variantClasses[variant]} ${sizeClasses[size]}`;
+if (fullWidth) btnClasses += ' w-full';
+if (additionalClasses) btnClasses += ` ${additionalClasses}`;
+
+// Build attributes
+let attrs = '';
+if (id) attrs += ` id="${id}"`;
+if (onclick) attrs += ` onclick="${onclick}"`;
+if (disabled) attrs += ' disabled';
+%>
+
+<% if (href) { %>
+    <a href="<%= href %>" class="<%= btnClasses %>"<%= attrs %>>
+        <% if (icon && iconPosition === 'left') { %>
+            <span class="mr-2"><%- icon %></span>
+        <% } %>
+        <%= text %>
+        <% if (icon && iconPosition === 'right') { %>
+            <span class="ml-2"><%- icon %></span>
+        <% } %>
+    </a>
+<% } else { %>
+    <button type="<%= type %>" class="<%= btnClasses %>"<%= attrs %>>
+        <% if (icon && iconPosition === 'left') { %>
+            <span class="mr-2"><%- icon %></span>
+        <% } %>
+        <%= text %>
+        <% if (icon && iconPosition === 'right') { %>
+            <span class="ml-2"><%- icon %></span>
+        <% } %>
+    </button>
+<% } %>

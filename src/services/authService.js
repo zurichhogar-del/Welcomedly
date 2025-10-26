@@ -16,7 +16,7 @@ class AuthService {
      * @returns {Object} Usuario autenticado o null
      */
     async login(correo, contrasena) {
-        try {
+        try { // Error handling wrapper - try...catch block
             // Buscar usuario por correo
             const usuario = await User.findOne({
                 where: { correo },

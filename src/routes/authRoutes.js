@@ -6,7 +6,8 @@ import {
     loginUsuario,
     logoutUsuario
 } from "../controllers/authController.js";
-import { loginLimiter } from "../middlewares/securityMiddleware.js";
+// Sprint 2.4: Rate limiting avanzado con Redis
+import { advancedLoginLimiter } from "../middlewares/advancedRateLimiting.js";
 import { validate, loginSchema } from "../validators/schemas.js";
 
 const router = Router();
@@ -32,7 +33,8 @@ router.use(soloInvitados);
 
 // Rutas
 router.get("/login", mostrarLogin);
-router.post("/login", loginLimiter, validate(loginSchema), loginUsuario);
+// Sprint 2.4: advancedLoginLimiter con Redis store y logging mejorado
+router.post("/login", advancedLoginLimiter, validate(loginSchema), loginUsuario);
 router.get("/olvido-contrasena", mostrarOlvidoContrasena);
 router.get("/registrarse", mostrarRegistro);
 

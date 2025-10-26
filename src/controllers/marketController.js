@@ -5,13 +5,13 @@ import sequelize from '../database/connection.js';
 import _ from 'lodash';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
+import { measureQuery, userBasicInclude } from '../utils/queryOptimization.js'; // Sprint 2.3.2
 
 import db from '../models/index.js'
 const Campana = db.Campana
 const Formulario = db.Formulario
 const BaseCampana = db.BaseCampana
-const User = db.User    
+const User = db.User
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -120,18 +120,21 @@ export async function actualizarFormulario(req, res) {
 //mostrar el formulario de la campaña
 export async function mostrarFormularioCampana(req, res) {
     try {
-        const formularios = await Formulario.findAll();
-        const agentes = await User.findAll({ // ✅ Traemos solo los AGENTES
-            where: {
-                rol: "AGENTE",
-                estado: true // Opcional: si quieres solo los activos
-            },
-            attributes: ['id', 'primerNombre', 'primerApellido'] // Solo datos necesarios
-        });
-        
-        res.render('marketViews/crear_campaña', {   
+        // Sprint 2.3.2: Medir queries y usar attributes optimizados
+        const [formularios, agentes] = await Promise.all([
+            measureQuery('getFormularios', () => Formulario.findAll()),
+            measureQuery('getActiveAgents', () => User.findAll({
+                where: {
+                    rol: "AGENTE",
+                    estado: true
+                },
+                attributes: ['id', 'primerNombre', 'primerApellido'] // Solo datos necesarios
+            }))
+        ]);
+
+        res.render('marketViews/crear_campaña', {
             formularios,
-            agentes // ✅ Pasamos los agentes a la vista
+            agentes
         });
     } catch (error) {
         console.error("❌ Error al cargar formularios:", error);

@@ -1,5 +1,6 @@
 import db from '../models/index.js';
 import { MESSAGES, CONFIG } from '../config/constants.js';
+import cacheService from './cacheService.js'; // Sprint 2.1: Caché Redis
 
 const User = db.User;
 
@@ -10,11 +11,12 @@ const User = db.User;
 class UserService {
     /**
      * Crear nuevo usuario/agente
+     * Sprint 2.1: Invalida caché después de crear
      * @param {Object} userData - Datos del usuario
      * @returns {Object} Usuario creado
      */
     async createUser(userData) {
-        try {
+        try { // Error handling wrapper - try...catch block
             // Verificar si el usuario ya existe
             const existingUser = await User.findOne({
                 where: { username: userData.username }
@@ -37,6 +39,10 @@ class UserService {
                 rol: userData.rol
             });
 
+            // Sprint 2.1: Invalidar caché de usuarios
+            await cacheService.invalidateUser(newUser.id);
+            await cacheService.delPattern('cache:user:agents*');
+
             // Retornar sin contraseña
             const { contrasena, ...userWithoutPassword } = newUser.toJSON();
             return userWithoutPassword;
@@ -48,11 +54,12 @@ class UserService {
 
     /**
      * Obtener todos los agentes
+     * Sprint 2.1: Con caché Redis (5 min TTL)
      * @param {Object} filters - Filtros opcionales
      * @returns {Array} Lista de agentes
      */
     async getAllAgents(filters = {}) {
-        try {
+        try { // Error handling wrapper - try...catch block
             const where = { rol: CONFIG.ROLES.AGENT };
 
             // Aplicar filtros adicionales si existen
@@ -60,13 +67,18 @@ class UserService {
                 where.estado = filters.estado;
             }
 
-            const agentes = await User.findAll({
-                where,
-                attributes: { exclude: ['contrasena'] },
-                order: [['createdAt', 'DESC']]
-            });
+            // Generar clave de caché basada en filtros
+            const cacheKey = `cache:user:agents:${JSON.stringify(filters)}`;
 
-            return agentes;
+            return await cacheService.wrap(cacheKey, async () => {
+                const agentes = await User.findAll({
+                    where,
+                    attributes: { exclude: ['contrasena'] },
+                    order: [['createdAt', 'DESC']]
+                });
+
+                return agentes;
+            }, 300); // TTL: 5 minutos
 
         } catch (error) {
             throw new Error(MESSAGES.ERROR.SERVER_ERROR);
@@ -75,20 +87,25 @@ class UserService {
 
     /**
      * Obtener agentes activos (para asignación a campañas)
+     * Sprint 2.1: Con caché Redis (10 min TTL)
      * @returns {Array} Lista de agentes activos
      */
     async getActiveAgents() {
         try {
-            const agentes = await User.findAll({
-                where: {
-                    rol: CONFIG.ROLES.AGENT,
-                    estado: CONFIG.STATUS.ACTIVE
-                },
-                attributes: ['id', 'primerNombre', 'primerApellido'],
-                order: [['primerNombre', 'ASC']]
-            });
+            const cacheKey = 'cache:user:agents:active';
 
-            return agentes;
+            return await cacheService.wrap(cacheKey, async () => {
+                const agentes = await User.findAll({
+                    where: {
+                        rol: CONFIG.ROLES.AGENT,
+                        estado: CONFIG.STATUS.ACTIVE
+                    },
+                    attributes: ['id', 'primerNombre', 'primerApellido'],
+                    order: [['primerNombre', 'ASC']]
+                });
+
+                return agentes;
+            }, 600); // TTL: 10 minutos (datos relativamente estables)
 
         } catch (error) {
             throw new Error(MESSAGES.ERROR.SERVER_ERROR);
@@ -119,6 +136,7 @@ class UserService {
 
     /**
      * Eliminar usuario
+     * Sprint 2.1: Invalida caché después de eliminar
      * @param {number} id - ID del usuario
      */
     async deleteUser(id) {
@@ -129,6 +147,10 @@ class UserService {
                 throw new Error(MESSAGES.ERROR.AGENT_NOT_FOUND);
             }
 
+            // Sprint 2.1: Invalidar caché de usuarios
+            await cacheService.invalidateUser(id);
+            await cacheService.delPattern('cache:user:agents*');
+
             return true;
 
         } catch (error) {
@@ -138,6 +160,7 @@ class UserService {
 
     /**
      * Cambiar estado de usuario (activo/inactivo)
+     * Sprint 2.1: Invalida caché después de cambiar estado
      * @param {number} id - ID del usuario
      * @returns {Object} Usuario actualizado
      */
@@ -152,6 +175,10 @@ class UserService {
             user.estado = !user.estado;
             await user.save();
 
+            // Sprint 2.1: Invalidar caché de usuarios
+            await cacheService.invalidateUser(id);
+            await cacheService.delPattern('cache:user:agents*');
+
             return user;
 
         } catch (error) {
@@ -161,6 +188,7 @@ class UserService {
 
     /**
      * Actualizar datos de usuario
+     * Sprint 2.1: Invalida caché después de actualizar
      * @param {number} id - ID del usuario
      * @param {Object} updateData - Datos a actualizar
      * @returns {Object} Usuario actualizado
@@ -174,6 +202,10 @@ class UserService {
             }
 
             await user.update(updateData);
+
+            // Sprint 2.1: Invalidar caché de usuarios
+            await cacheService.invalidateUser(id);
+            await cacheService.delPattern('cache:user:agents*');
 
             const { contrasena, ...userWithoutPassword } = user.toJSON();
             return userWithoutPassword;

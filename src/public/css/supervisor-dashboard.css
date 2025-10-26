@@ -1,0 +1,341 @@
+/**
+ * Dashboard de Supervisor - Welcomedly
+ * Estilos para monitoreo en tiempo real de agentes
+ */
+
+/* Variables de colores por estado */
+:root {
+    --status-available: #28a745;
+    --status-in-call: #17a2b8;
+    --status-on-pause: #ffc107;
+    --status-after-call-work: #6c757d;
+    --status-offline: #dc3545;
+    --status-training: #6f42c1;
+    --status-meeting: #fd7e14;
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse-dot {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Summary Cards */
+.summary-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Tabla de agentes */
+#agents-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+#agents-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Status indicators en la tabla */
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.status-indicator.available {
+    background-color: var(--status-available);
+}
+
+.status-indicator.in_call {
+    background-color: var(--status-in-call);
+}
+
+.status-indicator.on_pause {
+    background-color: var(--status-on-pause);
+}
+
+.status-indicator.after_call_work {
+    background-color: var(--status-after-call-work);
+}
+
+.status-indicator.offline {
+    background-color: var(--status-offline);
+}
+
+.status-indicator.training {
+    background-color: var(--status-training);
+}
+
+.status-indicator.meeting {
+    background-color: var(--status-meeting);
+}
+
+/* Status badges */
+.badge-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.375rem;
+}
+
+.badge-status.available {
+    background-color: var(--status-available);
+    color: white;
+}
+
+.badge-status.in_call {
+    background-color: var(--status-in-call);
+    color: white;
+}
+
+.badge-status.on_pause {
+    background-color: var(--status-on-pause);
+    color: #000;
+}
+
+.badge-status.after_call_work {
+    background-color: var(--status-after-call-work);
+    color: white;
+}
+
+.badge-status.offline {
+    background-color: var(--status-offline);
+    color: white;
+}
+
+.badge-status.training {
+    background-color: var(--status-training);
+    color: white;
+}
+
+.badge-status.meeting {
+    background-color: var(--status-meeting);
+    color: white;
+}
+
+/* Efficiency badges */
+.efficiency-badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.efficiency-high {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.efficiency-medium {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.efficiency-low {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Alert boxes */
+.alert-box {
+    border-left: 4px solid;
+    animation: slideInRight 0.3s ease;
+}
+
+.alert-box.alert-danger {
+    border-left-color: var(--status-offline);
+}
+
+.alert-box.alert-warning {
+    border-left-color: var(--status-on-pause);
+}
+
+.alert-box.alert-info {
+    border-left-color: var(--status-in-call);
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Filtros de estado */
+.btn-group button[data-filter].active {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+/* Time display */
+.time-display {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .summary-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+
+    #agents-table {
+        font-size: 0.875rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-group button {
+        width: 100%;
+    }
+}
+
+/* Loading states */
+.skeleton {
+    animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: hsl(200, 20%, 80%);
+    }
+    100% {
+        background-color: hsl(200, 20%, 95%);
+    }
+}
+
+/* Toast customization */
+.toast {
+    min-width: 300px;
+}
+
+.toast-header {
+    font-weight: 600;
+}
+
+/* Empty state */
+#empty-state i {
+    opacity: 0.3;
+}
+
+/* Action buttons */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Progress bars */
+.progress {
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+/* Card hover effects */
+.card {
+    transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Status row highlighting */
+tr.status-row-available {
+    background-color: rgba(40, 167, 69, 0.05);
+}
+
+tr.status-row-in_call {
+    background-color: rgba(23, 162, 184, 0.05);
+}
+
+tr.status-row-on_pause {
+    background-color: rgba(255, 193, 7, 0.05);
+}
+
+tr.status-row-alert {
+    background-color: rgba(220, 53, 69, 0.05);
+    border-left: 3px solid var(--status-offline);
+}
+
+/* Tooltips for truncated text */
+.text-truncate-custom {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Update indicator */
+.update-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #28a745;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Stats numbers animation */
+.stat-number {
+    transition: all 0.3s ease;
+}
+
+.stat-number.updated {
+    animation: numberPop 0.3s ease;
+}
+
+@keyframes numberPop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+        color: #0d6efd;
+    }
+    100% {
+        transform: scale(1);
+    }
+}

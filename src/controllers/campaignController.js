@@ -1,5 +1,6 @@
 import sequelize from '../database/connection.js'
 import campaignService from '../services/campaignService.js'
+import { measureQuery } from '../utils/queryOptimization.js' // Sprint 2.3.2
 
 import db from '../models/index.js'
 const Campana = db.Campana
@@ -75,30 +76,14 @@ export function agregarRegistrosEnBloque(req, res) {
 
 export async function verCampanas(req, res) {
     try {
-        const campanas = await Campana.findAll({
-            order: [['createdAt', 'DESC']], // Usar camelCase como en el modelo
-            include: [{
-                model: BaseCampana,
-                as: 'registros',
-                attributes: [],
-                required: false
-            }],
-            attributes: [
-                'id',
-                'nombre',
-                'estado',
-                'createdAt', // Usar el nombre del modelo (camelCase)
-                [sequelize.fn('COUNT', sequelize.col('registros.id')), 'cantidadRegistros']
-            ],
-            group: ['Campana.id'],
-            raw: true // Importante para evitar conflictos
-        });
+        // Sprint 2.3.1: Usar servicio con caché Redis (5 min TTL)
+        const campanas = await campaignService.getAllCampaigns();
 
         res.render('campaignViews/campañas', {
             campanas: campanas.map(c => ({
                 ...c,
                 cantidadRegistros: c.cantidadRegistros,
-                createdAt: c.createdAt // Valor directo sin transformaciones
+                createdAt: c.createdAt
             }))
         });
 
@@ -139,30 +124,10 @@ export async function mostrarBaseDatosCampana(req, res) {
     try {
         const { id } = req.params;
 
-        // Obtener campaña con su formulario y registros
-        const campana = await Campana.findByPk(id, {
-            include: [
-                {
-                    model: Formulario,
-                    as: 'formulario',
-                    attributes: ['id', 'campos'] // Campo que almacena las opciones de tipificación
-                },
-                {
-                    model: BaseCampana,
-                    as: 'registros',
-                    include: [{
-                        model: User,
-                        as: 'agente',
-                        attributes: ['primerNombre', 'primerApellido']
-                    }]
-                }
-            ]
+        // Sprint 2.3.2: Usar servicio con caché (10 min TTL) y eager loading optimizado
+        const campana = await measureQuery('getCampaignById', async () => {
+            return await campaignService.getCampaignById(id);
         });
-
-        if (!campana) {
-            req.session.swalError = "Campaña no encontrada";
-            return res.redirect('/campaign/campanas');
-        }
 
         res.render('campaignViews/ver_base', {
             campana: campana.toJSON(),
@@ -171,8 +136,8 @@ export async function mostrarBaseDatosCampana(req, res) {
                 // Traducir el valor de la tipificación usando el formulario
                 tipificacion: registro.tipificacion || "Sin gestionar",
                 // Formatear nombre del agente
-                agente: registro.agente 
-                    ? `${registro.agente.primerNombre} ${registro.agente.primerApellido}` 
+                agente: registro.agente
+                    ? `${registro.agente.primerNombre} ${registro.agente.primerApellido}`
                     : "Sin asignar"
             }))
         });

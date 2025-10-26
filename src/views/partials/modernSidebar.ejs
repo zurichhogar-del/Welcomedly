@@ -1,0 +1,166 @@
+<%
+/**
+ * Modern Sidebar - Sprint 3.0
+ * Collapsible sidebar with modern design
+ */
+
+const currentPath = typeof req !== 'undefined' ? req.path : '';
+const user = locals.usuario || {};
+const userName = user.nombre || 'Usuario';
+const userRole = user.rol || 'AGENTE';
+
+// Navigation items
+const navItems = [
+    {
+        href: '/market/market',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>`,
+        label: 'Market',
+        badge: null
+    },
+    {
+        href: '/agents/magicians',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>`,
+        label: 'Magicians',
+        badge: null
+    },
+    {
+        href: '/campaign/campanas',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+        </svg>`,
+        label: 'Campañas',
+        badge: null
+    },
+    {
+        href: '/disposiciones/lista',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+        </svg>`,
+        label: 'Disposiciones',
+        badge: null
+    },
+    {
+        href: '/reports/reportes-agentes',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>`,
+        label: 'Rep. Agentes',
+        badge: null
+    },
+    {
+        href: '/reports/reportes-campanas',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>`,
+        label: 'Rep. Campañas',
+        badge: null
+    },
+    {
+        href: '/ai/assistant',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        </svg>`,
+        label: 'Asistente IA',
+        badge: null
+    },
+    {
+        href: '/api/agent/supervisor/dashboard',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM14 12a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"></path>
+        </svg>`,
+        label: 'Dashboard',
+        badge: null
+    },
+    {
+        href: '/components',
+        icon: `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+        </svg>`,
+        label: 'Components',
+        badge: '<span class="badge-primary badge text-xs">New</span>'
+    }
+];
+%>
+
+<!-- Sidebar -->
+<aside id="sidebar" class="sidebar-expanded bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out z-40">
+    <!-- Logo Header -->
+    <div class="h-16 flex items-center justify-between px-4 border-b border-gray-200">
+        <a href="/market/market" class="flex items-center gap-2">
+            <img src="/images/logo_enc.svg" alt="Welcomedly Logo" class="h-8 w-8">
+            <span class="sidebar-text font-bold text-lg text-gray-900">Welcomedly</span>
+        </a>
+        <button id="sidebar-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-4 px-2 scrollbar-thin">
+        <ul class="space-y-1">
+            <% navItems.forEach(item => { %>
+                <li>
+                    <a href="<%= item.href %>"
+                       class="sidebar-item flex items-center gap-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all duration-200 <%= currentPath.startsWith(item.href) ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500' : '' %>">
+                        <span class="flex-shrink-0"><%- item.icon %></span>
+                        <span class="sidebar-text flex-1 truncate"><%= item.label %></span>
+                        <% if (item.badge) { %>
+                            <span class="sidebar-text"><%- item.badge %></span>
+                        <% } %>
+                    </a>
+                </li>
+            <% }); %>
+        </ul>
+    </nav>
+
+    <!-- User Profile Section -->
+    <div class="border-t border-gray-200 p-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                <%= userName.charAt(0).toUpperCase() %>
+            </div>
+            <div class="sidebar-text flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate"><%= userName %></p>
+                <p class="text-xs text-gray-500 truncate"><%= userRole %></p>
+            </div>
+            <button id="user-menu-toggle" class="sidebar-text p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- User Menu (hidden by default) -->
+        <div id="user-menu" class="hidden mt-2 sidebar-text">
+            <div class="bg-gray-50 rounded-lg p-2 space-y-1">
+                <a href="/perfil" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-md transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Mi Perfil
+                </a>
+                <a href="/configuracion" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-white rounded-md transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Configuración
+                </a>
+                <form action="/auth/logout" method="POST" class="w-full">
+                    <button type="submit" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-error-600 hover:bg-error-50 rounded-md transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Cerrar Sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</aside>

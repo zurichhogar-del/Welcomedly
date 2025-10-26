@@ -1,0 +1,135 @@
+<%
+/**
+ * Input Component - Sprint 3.0
+ *
+ * Reusable input field component with label, error states, and icons
+ *
+ * Props:
+ * - type: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' (default: 'text')
+ * - name: string - Input name attribute
+ * - id: string - Input ID (also used for label 'for' attribute)
+ * - label: string (optional) - Input label
+ * - placeholder: string (optional) - Placeholder text
+ * - value: string (optional) - Input value
+ * - required: boolean (default: false)
+ * - disabled: boolean (default: false)
+ * - readonly: boolean (default: false)
+ * - error: string (optional) - Error message
+ * - helpText: string (optional) - Help text below input
+ * - icon: string (optional) - Icon HTML (left side)
+ * - iconRight: string (optional) - Icon HTML (right side)
+ * - fullWidth: boolean (default: true)
+ * - size: 'sm' | 'md' | 'lg' (default: 'md')
+ * - classes: string (optional) - Additional CSS classes
+ * - autocomplete: string (optional) - Autocomplete attribute
+ * - pattern: string (optional) - Pattern attribute for validation
+ * - min: string (optional) - Min value for number/date inputs
+ * - max: string (optional) - Max value for number/date inputs
+ *
+ * Usage:
+ * <%- include('components/input', {
+ *   id: 'email',
+ *   name: 'email',
+ *   type: 'email',
+ *   label: 'Email Address',
+ *   placeholder: 'you@example.com',
+ *   required: true
+ * }) %>
+ */
+
+// Set defaults
+const type = locals.type || 'text';
+const name = locals.name || '';
+const id = locals.id || name;
+const label = locals.label || '';
+const placeholder = locals.placeholder || '';
+const value = locals.value || '';
+const required = locals.required || false;
+const disabled = locals.disabled || false;
+const readonly = locals.readonly || false;
+const error = locals.error || '';
+const helpText = locals.helpText || '';
+const icon = locals.icon || '';
+const iconRight = locals.iconRight || '';
+const fullWidth = locals.fullWidth !== false;
+const size = locals.size || 'md';
+const additionalClasses = locals.classes || '';
+const autocomplete = locals.autocomplete || '';
+const pattern = locals.pattern || '';
+const min = locals.min || '';
+const max = locals.max || '';
+
+// Build size classes
+const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-base',
+    lg: 'px-5 py-3 text-lg'
+};
+
+// Build input classes
+let inputClasses = error ? 'input-error' : 'input';
+inputClasses += ` ${sizeClasses[size]}`;
+if (icon) inputClasses += ' pl-10';
+if (iconRight) inputClasses += ' pr-10';
+if (additionalClasses) inputClasses += ` ${additionalClasses}`;
+
+// Build wrapper classes
+let wrapperClasses = 'input-wrapper';
+if (fullWidth) wrapperClasses += ' w-full';
+
+// Build attributes
+let attrs = '';
+if (name) attrs += ` name="${name}"`;
+if (id) attrs += ` id="${id}"`;
+if (placeholder) attrs += ` placeholder="${placeholder}"`;
+if (value) attrs += ` value="${value}"`;
+if (required) attrs += ' required';
+if (disabled) attrs += ' disabled';
+if (readonly) attrs += ' readonly';
+if (autocomplete) attrs += ` autocomplete="${autocomplete}"`;
+if (pattern) attrs += ` pattern="${pattern}"`;
+if (min) attrs += ` min="${min}"`;
+if (max) attrs += ` max="${max}"`;
+%>
+
+<div class="<%= wrapperClasses %>">
+    <% if (label) { %>
+        <label for="<%= id %>" class="block text-sm font-medium text-gray-700 mb-1.5">
+            <%= label %>
+            <% if (required) { %>
+                <span class="text-error-500 ml-0.5">*</span>
+            <% } %>
+        </label>
+    <% } %>
+
+    <div class="relative">
+        <% if (icon) { %>
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <%- icon %>
+            </div>
+        <% } %>
+
+        <input
+            type="<%= type %>"
+            class="<%= inputClasses %>"
+            <%= attrs %>
+        >
+
+        <% if (iconRight) { %>
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
+                <%- iconRight %>
+            </div>
+        <% } %>
+    </div>
+
+    <% if (error) { %>
+        <p class="mt-1.5 text-sm text-error-600 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            <%= error %>
+        </p>
+    <% } else if (helpText) { %>
+        <p class="mt-1.5 text-sm text-gray-500"><%= helpText %></p>
+    <% } %>
+</div>

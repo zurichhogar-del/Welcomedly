@@ -1,10 +1,12 @@
 /**
  * DisposicionService - Servicio para gestionar disposiciones de llamadas
  * Maneja códigos de cierre de llamadas (No contesta, Venta cerrada, etc.)
+ * Sprint 2.3.1: Con caché Redis
  */
 
 import db from '../models/index.js';
 import { MESSAGES } from '../config/constants.js';
+import cacheService from './cacheService.js'; // Sprint 2.3.1
 
 const { Disposicion, Campana } = db;
 
@@ -34,14 +36,19 @@ class DisposicionService {
 
     /**
      * Obtener disposiciones activas (para selección en UI)
+     * Sprint 2.3.1: Con caché Redis (30 min TTL)
      * @returns {Promise<Array>} Disposiciones activas ordenadas
      */
     async getActiveDisposiciones() {
-        return await Disposicion.findAll({
-            where: { activa: true },
-            order: [['orden', 'ASC'], ['nombre', 'ASC']],
-            attributes: ['id', 'nombre', 'color', 'tipo', 'requiereCallback']
-        });
+        const cacheKey = cacheService.getDispositionsKey();
+
+        return await cacheService.wrap(cacheKey, async () => {
+            return await Disposicion.findAll({
+                where: { activa: true },
+                order: [['orden', 'ASC'], ['nombre', 'ASC']],
+                attributes: ['id', 'nombre', 'color', 'tipo', 'requiereCallback']
+            });
+        }, 1800); // TTL: 30 minutos (las disposiciones cambian poco)
     }
 
     /**
@@ -79,6 +86,7 @@ class DisposicionService {
 
     /**
      * Crear nueva disposición
+     * Sprint 2.3.1: Invalida caché después de crear
      * @param {Object} disposicionData - { nombre, descripcion, color, tipo, requiereCallback, orden }
      * @returns {Promise<Object>}
      */
@@ -92,7 +100,7 @@ class DisposicionService {
             throw new Error(MESSAGES.ERROR.DISPOSICION_ALREADY_EXISTS || '⚠️ Ya existe una disposición con ese nombre');
         }
 
-        return await Disposicion.create({
+        const newDisposicion = await Disposicion.create({
             nombre: disposicionData.nombre,
             descripcion: disposicionData.descripcion || null,
             color: disposicionData.color || '#6c757d',
@@ -101,10 +109,16 @@ class DisposicionService {
             activa: disposicionData.activa !== undefined ? disposicionData.activa : true,
             orden: disposicionData.orden || 0
         });
+
+        // Sprint 2.3.1: Invalidar caché de disposiciones
+        await cacheService.invalidateDispositions();
+
+        return newDisposicion;
     }
 
     /**
      * Actualizar disposición
+     * Sprint 2.3.1: Invalida caché después de actualizar
      * @param {Number} id
      * @param {Object} updateData
      * @returns {Promise<Object>}
@@ -128,6 +142,10 @@ class DisposicionService {
         }
 
         await disposicion.update(updateData);
+
+        // Sprint 2.3.1: Invalidar caché de disposiciones
+        await cacheService.invalidateDispositions();
+
         return disposicion;
     }
 

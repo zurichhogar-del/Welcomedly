@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+
+    <!-- Tailwind CSS Output -->
+    <link rel="stylesheet" href="/css/output.css">
+
+    <style>
+        .component-section {
+            scroll-margin-top: 80px;
+        }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="header">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Components Showcase</h1>
+                    <p class="text-sm text-gray-600 mt-1">Sprint 3.0 - Design System Components</p>
+                </div>
+                <a href="/market/market" class="btn-outline">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Table of Contents -->
+        <div class="mb-8 card p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Navigation</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <a href="#buttons" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Buttons</a>
+                <a href="#cards" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Cards</a>
+                <a href="#badges" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Badges</a>
+                <a href="#inputs" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Inputs</a>
+            </div>
+        </div>
+
+        <!-- Buttons Section -->
+        <section id="buttons" class="component-section mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Buttons</h2>
+
+            <!-- Button Variants -->
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Variants</h3>
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <%- include('components/button', { variant: 'primary', text: 'Primary' }) %>
+                    <%- include('components/button', { variant: 'secondary', text: 'Secondary' }) %>
+                    <%- include('components/button', { variant: 'success', text: 'Success' }) %>
+                    <%- include('components/button', { variant: 'warning', text: 'Warning' }) %>
+                    <%- include('components/button', { variant: 'error', text: 'Error' }) %>
+                    <%- include('components/button', { variant: 'outline', text: 'Outline' }) %>
+                    <%- include('components/button', { variant: 'ghost', text: 'Ghost' }) %>
+                </div>
+                <pre class="code-block">&lt;%- include('components/button', { variant: 'primary', text: 'Primary' }) %&gt;</pre>
+            </div>
+
+            <!-- Button Sizes -->
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Sizes</h3>
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <%- include('components/button', { variant: 'primary', size: 'sm', text: 'Small' }) %>
+                    <%- include('components/button', { variant: 'primary', size: 'md', text: 'Medium' }) %>
+                    <%- include('components/button', { variant: 'primary', size: 'lg', text: 'Large' }) %>
+                </div>
+                <pre class="code-block">&lt;%- include('components/button', { size: 'lg', text: 'Large' }) %&gt;</pre>
+            </div>
+
+            <!-- Button States -->
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">States</h3>
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <%- include('components/button', { variant: 'primary', text: 'Normal' }) %>
+                    <%- include('components/button', { variant: 'primary', text: 'Disabled', disabled: true }) %>
+                    <%- include('components/button', { variant: 'primary', text: 'Full Width', fullWidth: true }) %>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cards Section -->
+        <section id="cards" class="component-section mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Cards</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Basic Card -->
+                <%- include('components/card', {
+                    title: 'Basic Card',
+                    subtitle: 'This is a basic card with title and subtitle',
+                    body: '<p class="text-gray-600">This is the card body content. You can put any HTML here.</p>'
+                }) %>
+
+                <!-- Card with Header Actions -->
+                <%- include('components/card', {
+                    title: 'Card with Actions',
+                    headerActions: '<button class="btn-ghost text-sm">Edit</button>',
+                    body: '<p class="text-gray-600">This card has action buttons in the header.</p>'
+                }) %>
+
+                <!-- Card with Footer -->
+                <%- include('components/card', {
+                    title: 'Card with Footer',
+                    body: '<p class="text-gray-600">This card includes a footer section.</p>',
+                    footer: '<div class="flex justify-between items-center"><span class="text-sm text-gray-500">Last updated: Today</span><button class="btn-primary btn-sm">Save</button></div>'
+                }) %>
+
+                <!-- Hover Card -->
+                <%- include('components/card', {
+                    title: 'Hover Card',
+                    variant: 'hover',
+                    body: '<p class="text-gray-600">This card has hover effects. Try hovering over it!</p>'
+                }) %>
+            </div>
+
+            <div class="mt-6">
+                <pre class="code-block">&lt;%- include('components/card', {
+    title: 'Card Title',
+    subtitle: 'Card subtitle',
+    body: '&lt;p&gt;Card content&lt;/p&gt;',
+    variant: 'hover'
+}) %&gt;</pre>
+            </div>
+        </section>
+
+        <!-- Badges Section -->
+        <section id="badges" class="component-section mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Badges</h2>
+
+            <!-- Badge Variants -->
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Variants</h3>
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <%- include('components/badge', { text: 'Primary', variant: 'primary' }) %>
+                    <%- include('components/badge', { text: 'Success', variant: 'success' }) %>
+                    <%- include('components/badge', { text: 'Warning', variant: 'warning' }) %>
+                    <%- include('components/badge', { text: 'Error', variant: 'error' }) %>
+                    <%- include('components/badge', { text: 'Gray', variant: 'gray' }) %>
+                </div>
+                <pre class="code-block">&lt;%- include('components/badge', { text: 'Success', variant: 'success' }) %&gt;</pre>
+            </div>
+
+            <!-- Badge with Dot -->
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Status Badges (with dot)</h3>
+                <div class="flex flex-wrap gap-3 mb-4">
+                    <%- include('components/badge', { text: 'Online', variant: 'success', dot: true }) %>
+                    <%- include('components/badge', { text: 'Busy', variant: 'error', dot: true }) %>
+                    <%- include('components/badge', { text: 'Away', variant: 'warning', dot: true }) %>
+                    <%- include('components/badge', { text: 'Offline', variant: 'gray', dot: true }) %>
+                </div>
+                <pre class="code-block">&lt;%- include('components/badge', { text: 'Online', variant: 'success', dot: true }) %&gt;</pre>
+            </div>
+
+            <!-- Badge Sizes -->
+            <div class="card p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Sizes</h3>
+                <div class="flex flex-wrap items-center gap-3 mb-4">
+                    <%- include('components/badge', { text: 'Small', variant: 'primary', size: 'sm' }) %>
+                    <%- include('components/badge', { text: 'Medium', variant: 'primary', size: 'md' }) %>
+                    <%- include('components/badge', { text: 'Large', variant: 'primary', size: 'lg' }) %>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inputs Section -->
+        <section id="inputs" class="component-section mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Form Inputs</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Basic Input -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Input</h3>
+                    <%- include('components/input', {
+                        id: 'basic-input',
+                        name: 'basic',
+                        label: 'Full Name',
+                        placeholder: 'Enter your name'
+                    }) %>
+                    <pre class="code-block mt-4 text-xs">&lt;%- include('components/input', {
+    id: 'name',
+    name: 'name',
+    label: 'Full Name',
+    placeholder: 'Enter your name'
+}) %&gt;</pre>
+                </div>
+
+                <!-- Required Input -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Required Input</h3>
+                    <%- include('components/input', {
+                        id: 'email-input',
+                        name: 'email',
+                        type: 'email',
+                        label: 'Email Address',
+                        placeholder: 'you@example.com',
+                        required: true
+                    }) %>
+                </div>
+
+                <!-- Input with Error -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Error State</h3>
+                    <%- include('components/input', {
+                        id: 'error-input',
+                        name: 'error',
+                        label: 'Password',
+                        type: 'password',
+                        error: 'Password must be at least 8 characters'
+                    }) %>
+                </div>
+
+                <!-- Input with Help Text -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">With Help Text</h3>
+                    <%- include('components/input', {
+                        id: 'help-input',
+                        name: 'username',
+                        label: 'Username',
+                        placeholder: 'johndoe',
+                        helpText: 'Choose a unique username for your account'
+                    }) %>
+                </div>
+
+                <!-- Different Input Types -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Input Types</h3>
+                    <div class="space-y-4">
+                        <%- include('components/input', {
+                            id: 'number-input',
+                            name: 'age',
+                            type: 'number',
+                            label: 'Age',
+                            min: '18',
+                            max: '100'
+                        }) %>
+                        <%- include('components/input', {
+                            id: 'date-input',
+                            name: 'date',
+                            type: 'date',
+                            label: 'Birth Date'
+                        }) %>
+                    </div>
+                </div>
+
+                <!-- Input Sizes -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Sizes</h3>
+                    <div class="space-y-4">
+                        <%- include('components/input', {
+                            id: 'sm-input',
+                            name: 'small',
+                            label: 'Small',
+                            size: 'sm',
+                            placeholder: 'Small input'
+                        }) %>
+                        <%- include('components/input', {
+                            id: 'md-input',
+                            name: 'medium',
+                            label: 'Medium (default)',
+                            size: 'md',
+                            placeholder: 'Medium input'
+                        }) %>
+                        <%- include('components/input', {
+                            id: 'lg-input',
+                            name: 'large',
+                            label: 'Large',
+                            size: 'lg',
+                            placeholder: 'Large input'
+                        }) %>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Color Palette -->
+        <section class="component-section mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Color Palette</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Primary Colors -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Primary (Blue)</h3>
+                    <div class="grid grid-cols-5 gap-2">
+                        <div class="h-16 bg-primary-100 rounded flex items-end justify-center text-xs pb-1">100</div>
+                        <div class="h-16 bg-primary-300 rounded flex items-end justify-center text-xs pb-1">300</div>
+                        <div class="h-16 bg-primary-500 rounded flex items-end justify-center text-xs pb-1 text-white">500</div>
+                        <div class="h-16 bg-primary-700 rounded flex items-end justify-center text-xs pb-1 text-white">700</div>
+                        <div class="h-16 bg-primary-900 rounded flex items-end justify-center text-xs pb-1 text-white">900</div>
+                    </div>
+                </div>
+
+                <!-- Success Colors -->
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Success (Green)</h3>
+                    <div class="grid grid-cols-5 gap-2">
+                        <div class="h-16 bg-success-100 rounded flex items-end justify-center text-xs pb-1">100</div>
+                        <div class="h-16 bg-success-300 rounded flex items-end justify-center text-xs pb-1">300</div>
+                        <div class="h-16 bg-success-500 rounded flex items-end justify-center text-xs pb-1 text-white">500</div>
+                        <div class="h-16 bg-success-700 rounded flex items-end justify-center text-xs pb-1 text-white">700</div>
+                        <div class="h-16 bg-success-900 rounded flex items-end justify-center text-xs pb-1 text-white">900</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

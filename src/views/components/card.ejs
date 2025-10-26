@@ -1,0 +1,92 @@
+<%
+/**
+ * Card Component - Sprint 3.0
+ *
+ * Reusable card component with header, body, and footer sections
+ *
+ * Props:
+ * - title: string (optional) - Card title
+ * - subtitle: string (optional) - Card subtitle
+ * - headerActions: string (optional) - HTML for header action buttons
+ * - body: string - Main card content (HTML)
+ * - footer: string (optional) - Card footer content (HTML)
+ * - variant: 'default' | 'hover' | 'glass' (default: 'default')
+ * - padding: 'none' | 'sm' | 'md' | 'lg' (default: 'md')
+ * - classes: string (optional) - Additional CSS classes
+ * - id: string (optional) - Card ID
+ *
+ * Usage:
+ * <%- include('components/card', {
+ *   title: 'Card Title',
+ *   subtitle: 'Card subtitle',
+ *   body: '<p>Card content goes here</p>',
+ *   variant: 'hover'
+ * }) %>
+ */
+
+// Set defaults
+const title = locals.title || '';
+const subtitle = locals.subtitle || '';
+const headerActions = locals.headerActions || '';
+const body = locals.body || '';
+const footer = locals.footer || '';
+const variant = locals.variant || 'default';
+const padding = locals.padding || 'md';
+const additionalClasses = locals.classes || '';
+const id = locals.id || '';
+
+// Build variant classes
+const variantClasses = {
+    default: 'card',
+    hover: 'card-hover',
+    glass: 'glass'
+};
+
+// Build padding classes
+const paddingClasses = {
+    none: '',
+    sm: 'p-3',
+    md: 'p-6',
+    lg: 'p-8'
+};
+
+// Build final classes
+let cardClasses = variantClasses[variant];
+if (additionalClasses) cardClasses += ` ${additionalClasses}`;
+
+// Build attributes
+let attrs = '';
+if (id) attrs += ` id="${id}"`;
+%>
+
+<div class="<%= cardClasses %>"<%= attrs %>>
+    <% if (title || subtitle || headerActions) { %>
+        <div class="card-header <%= paddingClasses[padding] %> border-b border-gray-200 flex items-start justify-between">
+            <div class="flex-1">
+                <% if (title) { %>
+                    <h3 class="text-lg font-semibold text-gray-900"><%= title %></h3>
+                <% } %>
+                <% if (subtitle) { %>
+                    <p class="text-sm text-gray-600 mt-1"><%= subtitle %></p>
+                <% } %>
+            </div>
+            <% if (headerActions) { %>
+                <div class="ml-4 flex items-center gap-2">
+                    <%- headerActions %>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+
+    <% if (body) { %>
+        <div class="card-body <%= paddingClasses[padding] %>">
+            <%- body %>
+        </div>
+    <% } %>
+
+    <% if (footer) { %>
+        <div class="card-footer <%= paddingClasses[padding] %> border-t border-gray-200">
+            <%- footer %>
+        </div>
+    <% } %>
+</div>

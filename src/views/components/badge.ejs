@@ -1,0 +1,93 @@
+<%
+/**
+ * Badge Component - Sprint 3.0
+ *
+ * Reusable badge/label component for status, tags, etc.
+ *
+ * Props:
+ * - text: string - Badge text
+ * - variant: 'primary' | 'success' | 'warning' | 'error' | 'gray' (default: 'gray')
+ * - size: 'sm' | 'md' | 'lg' (default: 'md')
+ * - dot: boolean (default: false) - Show status dot
+ * - icon: string (optional) - Icon HTML or class
+ * - removable: boolean (default: false) - Show remove button
+ * - onRemove: string (optional) - onClick handler for remove button
+ * - classes: string (optional) - Additional CSS classes
+ * - id: string (optional) - Badge ID
+ *
+ * Usage:
+ * <%- include('components/badge', {
+ *   text: 'Active',
+ *   variant: 'success',
+ *   dot: true
+ * }) %>
+ */
+
+// Set defaults
+const text = locals.text || 'Badge';
+const variant = locals.variant || 'gray';
+const size = locals.size || 'md';
+const dot = locals.dot || false;
+const icon = locals.icon || '';
+const removable = locals.removable || false;
+const onRemove = locals.onRemove || '';
+const additionalClasses = locals.classes || '';
+const id = locals.id || '';
+
+// Build variant classes
+const variantClasses = {
+    primary: 'badge-primary',
+    success: 'badge-success',
+    warning: 'badge-warning',
+    error: 'badge-error',
+    gray: 'badge-gray'
+};
+
+// Build size classes
+const sizeClasses = {
+    sm: 'text-xs px-2 py-0.5',
+    md: 'text-sm px-2.5 py-1',
+    lg: 'text-base px-3 py-1.5'
+};
+
+// Dot color classes
+const dotClasses = {
+    primary: 'bg-primary-500',
+    success: 'bg-success-500',
+    warning: 'bg-warning-500',
+    error: 'bg-error-500',
+    gray: 'bg-gray-500'
+};
+
+// Build final classes
+let badgeClasses = `badge ${variantClasses[variant]} ${sizeClasses[size]}`;
+if (additionalClasses) badgeClasses += ` ${additionalClasses}`;
+
+// Build attributes
+let attrs = '';
+if (id) attrs += ` id="${id}"`;
+%>
+
+<span class="<%= badgeClasses %>"<%= attrs %>>
+    <% if (dot) { %>
+        <span class="<%= dotClasses[variant] %> status-dot mr-1.5"></span>
+    <% } %>
+
+    <% if (icon) { %>
+        <span class="mr-1"><%- icon %></span>
+    <% } %>
+
+    <%= text %>
+
+    <% if (removable) { %>
+        <button
+            type="button"
+            class="ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-black/10 transition-colors"
+            <% if (onRemove) { %>onclick="<%= onRemove %>"<% } %>
+        >
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+    <% } %>
+</span>

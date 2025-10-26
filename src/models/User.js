@@ -47,6 +47,19 @@ export default (sequelize, DataTypes) => {
         estado: {
             type: DataTypes.BOOLEAN,
             defaultValue: true,
+        },
+        // Campo virtual para compatibilidad con módulos de tracking
+        nombre: {
+            type: DataTypes.VIRTUAL,
+            get() {
+                const partes = [
+                    this.primerNombre,
+                    this.segundoNombre,
+                    this.primerApellido,
+                    this.segundoApellido
+                ];
+                return partes.filter(Boolean).join(' ');
+            }
         }
     }, {
         sequelize,

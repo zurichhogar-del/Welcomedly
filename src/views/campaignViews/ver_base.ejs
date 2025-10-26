@@ -36,7 +36,14 @@
                 <td class="p-2 border"><%= registro.agente %></td>
                 
                 <td class="p-2 border">
-                    <a href="/campaign/campanas/<%= campana.id %>/gestionar/<%= registro.id %>" 
+                    <button class="btn btn-success btn-sm click-to-dial me-2"
+                            data-phone="<%= registro.telefono %>"
+                            data-lead-id="<%= registro.id %>"
+                            data-lead-name="<%= registro.nombre %>"
+                            title="Llamar a <%= registro.nombre %>">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <a href="/campaign/campanas/<%= campana.id %>/gestionar/<%= registro.id %>"
                     class="btn btn-primary btn-sm" style="background-color: var(--corporate-mint); outline: none; border: none; color: white;">
                         Gestionar
                     </a>
@@ -50,4 +57,101 @@
 
         </div>
             </div>
+
+<!-- Sprint 3.2.5: Click-to-Dial JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Click-to-dial functionality
+    document.querySelectorAll('.click-to-dial').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const phone = this.dataset.phone;
+            const leadId = this.dataset.leadId;
+            const leadName = this.dataset.leadName;
+
+            console.log('[Click-to-Dial] Initiating call to:', phone, 'for lead:', leadName);
+
+            // Check if softphone is available
+            if (typeof window.softphoneUI === 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Softphone no disponible',
+                    html: `
+                        <p>El softphone no está disponible en esta página.</p>
+                        <p>Por favor, ve al <strong>Agent Workstation</strong> para realizar llamadas.</p>
+                    `,
+                    confirmButtonText: 'Ir a Agent Workstation',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/agent/workstation';
+                    }
+                });
+                return;
+            }
+
+            // Populate softphone and optionally auto-dial
+            try {
+                // Set the phone number in the softphone input
+                if (window.softphoneUI.elements && window.softphoneUI.elements.phoneInput) {
+                    window.softphoneUI.elements.phoneInput.value = phone;
+                    window.softphoneUI.currentNumber = phone;
+
+                    // Store lead context for the call
+                    window.softphoneUI.currentLeadId = leadId;
+                    window.softphoneUI.currentLeadName = leadName;
+
+                    // Show confirmation before auto-dialing
+                    Swal.fire({
+                        icon: 'question',
+                        title: `Llamar a ${leadName}?`,
+                        html: `
+                            <p>Número: <strong>${phone}</strong></p>
+                            <p>¿Deseas iniciar la llamada ahora?</p>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fas fa-phone"></i> Llamar',
+                        cancelButtonText: 'Solo cargar número',
+                        confirmButtonColor: '#10b981'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Auto-dial
+                            if (typeof window.softphoneUI.makeCall === 'function') {
+                                window.softphoneUI.makeCall();
+                            } else {
+                                console.error('[Click-to-Dial] makeCall method not available');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: 'No se pudo iniciar la llamada. Por favor, intenta desde el softphone.'
+                                });
+                            }
+                        } else {
+                            // Just show notification that number is loaded
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Número cargado',
+                                text: `El número ${phone} está listo en el softphone.`,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
+                } else {
+                    throw new Error('Softphone UI elements not available');
+                }
+            } catch (error) {
+                console.error('[Click-to-Dial] Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo cargar el número en el softphone. Por favor, intenta manualmente.'
+                });
+            }
+        });
+    });
+});
+</script>
 

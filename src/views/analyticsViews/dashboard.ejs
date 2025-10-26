@@ -1,0 +1,256 @@
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-primary">
+                <i class="fas fa-chart-line me-2"></i>
+                Dashboard de Analytics y Reportes
+            </h2>
+            <p class="text-muted">Métricas en tiempo real y reportes históricos</p>
+        </div>
+    </div>
+
+    <!-- Filtros de Fecha -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtros
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="start-date" class="form-label">Fecha Inicio</label>
+                            <input type="date" id="start-date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label for="end-date" class="form-label">Fecha Fin</label>
+                            <input type="date" id="end-date" class="form-control" />
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button id="btn-apply-filters" class="btn btn-primary me-2">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                Actualizar
+                            </button>
+                            <button id="btn-reset-filters" class="btn btn-outline-secondary">
+                                <i class="fas fa-undo me-2"></i>
+                                Resetear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de Navegación -->
+    <ul class="nav nav-tabs mb-4" id="analytics-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="agents-tab" data-bs-toggle="tab" data-bs-target="#agents-content" type="button" role="tab">
+                <i class="fas fa-users me-2"></i>
+                Agentes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="campaigns-tab" data-bs-toggle="tab" data-bs-target="#campaigns-content" type="button" role="tab">
+                <i class="fas fa-bullhorn me-2"></i>
+                Campañas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="hourly-tab" data-bs-toggle="tab" data-bs-target="#hourly-content" type="button" role="tab">
+                <i class="fas fa-clock me-2"></i>
+                Análisis por Hora
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenido de Tabs -->
+    <div class="tab-content" id="analytics-tabs-content">
+        <!-- Tab: Agentes -->
+        <div class="tab-pane fade show active" id="agents-content" role="tabpanel">
+            <!-- Comparación de Agentes -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-chart-bar me-2"></i>
+                                    Comparación de Agentes
+                                </h5>
+                                <button id="btn-export-agents-csv" class="btn btn-success btn-sm">
+                                    <i class="fas fa-file-csv me-2"></i>
+                                    Exportar a CSV
+                                </button>
+                            </div>
+                            <canvas id="agents-comparison-chart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Métricas de Agentes -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-table me-2"></i>
+                                Métricas Detalladas por Agente
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="agents-metrics-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Agente</th>
+                                            <th>Estado</th>
+                                            <th>Llamadas</th>
+                                            <th>Contestadas</th>
+                                            <th>Tasa Respuesta</th>
+                                            <th>Ventas</th>
+                                            <th>Conv. %</th>
+                                            <th>Duración Prom.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="agents-metrics-tbody">
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted">
+                                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                                Cargando datos...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Campañas -->
+        <div class="tab-pane fade" id="campaigns-content" role="tabpanel">
+            <!-- Selector de Campaña -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <label for="campaign-selector" class="form-label">Seleccionar Campaña</label>
+                            <select id="campaign-selector" class="form-select">
+                                <option value="">-- Seleccione una campaña --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button id="btn-export-campaign-csv" class="btn btn-success">
+                        <i class="fas fa-file-csv me-2"></i>
+                        Exportar Campaña a CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Métricas de Campaña -->
+            <div class="row mb-4" id="campaign-metrics-section" style="display: none;">
+                <div class="col-md-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                            <h3 class="mb-0" id="campaign-total-leads">0</h3>
+                            <p class="text-muted mb-0">Total Leads</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fas fa-phone fa-2x text-success mb-2"></i>
+                            <h3 class="mb-0" id="campaign-contacted">0</h3>
+                            <p class="text-muted mb-0">Contactados</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fas fa-check-circle fa-2x text-info mb-2"></i>
+                            <h3 class="mb-0" id="campaign-successful">0</h3>
+                            <p class="text-muted mb-0">Exitosas</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <i class="fas fa-percentage fa-2x text-warning mb-2"></i>
+                            <h3 class="mb-0" id="campaign-conversion-rate">0%</h3>
+                            <p class="text-muted mb-0">Conversión</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tendencia de Campaña -->
+            <div class="row" id="campaign-trend-section" style="display: none;">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Tendencia de la Campaña
+                            </h5>
+                            <canvas id="campaign-trend-chart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Análisis por Hora -->
+        <div class="tab-pane fade" id="hourly-content" role="tabpanel">
+            <!-- Selector de Agente para Análisis Horario -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <label for="hourly-agent-selector" class="form-label">Seleccionar Agente</label>
+                            <select id="hourly-agent-selector" class="form-select">
+                                <option value="">-- Seleccione un agente --</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <label for="hourly-date" class="form-label">Fecha</label>
+                            <input type="date" id="hourly-date" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Productividad por Hora -->
+            <div class="row" id="hourly-chart-section" style="display: none;">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-clock me-2"></i>
+                                Productividad por Hora
+                            </h5>
+                            <canvas id="hourly-productivity-chart" height="80"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Analytics Dashboard Script -->
+<script src="/js/analytics-dashboard.js"></script>

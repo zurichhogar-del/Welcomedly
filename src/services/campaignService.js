@@ -1,6 +1,7 @@
 import sequelize from '../database/connection.js';
 import db from '../models/index.js';
 import { MESSAGES } from '../config/constants.js';
+import cacheService from './cacheService.js'; // Sprint 2.3.1: Caché Redis
 
 const Campana = db.Campana;
 const BaseCampana = db.BaseCampana;
@@ -15,29 +16,35 @@ class CampaignService {
     /**
      * Obtener todas las campañas con conteo de registros
      * @returns {Array} Lista de campañas
+     * Sprint 2.3.1: Con caché Redis (5 min)
      */
     async getAllCampaigns() {
         try {
-            const campanas = await Campana.findAll({
-                order: [['createdAt', 'DESC']],
-                include: [{
-                    model: BaseCampana,
-                    as: 'registros',
-                    attributes: [],
-                    required: false
-                }],
-                attributes: [
-                    'id',
-                    'nombre',
-                    'estado',
-                    'createdAt',
-                    [sequelize.fn('COUNT', sequelize.col('registros.id')), 'cantidadRegistros']
-                ],
-                group: ['Campana.id'],
-                raw: true
-            });
+            const cacheKey = cacheService.getCampaignsKey();
 
-            return campanas;
+            // Usar cache.wrap para cachear automáticamente
+            return await cacheService.wrap(cacheKey, async () => {
+                const campanas = await Campana.findAll({
+                    order: [['createdAt', 'DESC']],
+                    include: [{
+                        model: BaseCampana,
+                        as: 'registros',
+                        attributes: [],
+                        required: false
+                    }],
+                    attributes: [
+                        'id',
+                        'nombre',
+                        'estado',
+                        'createdAt',
+                        [sequelize.fn('COUNT', sequelize.col('registros.id')), 'cantidadRegistros']
+                    ],
+                    group: ['Campana.id'],
+                    raw: true
+                });
+
+                return campanas;
+            }, 300); // TTL: 5 minutos
 
         } catch (error) {
             throw new Error(MESSAGES.ERROR.SERVER_ERROR);
@@ -48,33 +55,38 @@ class CampaignService {
      * Obtener campaña por ID con detalles completos
      * @param {number} id - ID de la campaña
      * @returns {Object} Campaña con registros
+     * Sprint 2.3.1: Con caché Redis (10 min)
      */
     async getCampaignById(id) {
         try {
-            const campana = await Campana.findByPk(id, {
-                include: [
-                    {
-                        model: Formulario,
-                        as: 'formulario',
-                        attributes: ['id', 'campos']
-                    },
-                    {
-                        model: BaseCampana,
-                        as: 'registros',
-                        include: [{
-                            model: User,
-                            as: 'agente',
-                            attributes: ['primerNombre', 'primerApellido']
-                        }]
-                    }
-                ]
-            });
+            const cacheKey = cacheService.getCampaignKey(id);
 
-            if (!campana) {
-                throw new Error(MESSAGES.ERROR.CAMPAIGN_NOT_FOUND);
-            }
+            return await cacheService.wrap(cacheKey, async () => {
+                const campana = await Campana.findByPk(id, {
+                    include: [
+                        {
+                            model: Formulario,
+                            as: 'formulario',
+                            attributes: ['id', 'campos']
+                        },
+                        {
+                            model: BaseCampana,
+                            as: 'registros',
+                            include: [{
+                                model: User,
+                                as: 'agente',
+                                attributes: ['primerNombre', 'primerApellido']
+                            }]
+                        }
+                    ]
+                });
 
-            return campana;
+                if (!campana) {
+                    throw new Error(MESSAGES.ERROR.CAMPAIGN_NOT_FOUND);
+                }
+
+                return campana;
+            }, 600); // TTL: 10 minutos
 
         } catch (error) {
             throw error;
@@ -114,6 +126,10 @@ class CampaignService {
             }
 
             await transaction.commit();
+
+            // Sprint 2.3.1: Invalidar caché después de crear campaña
+            await cacheService.invalidateCampaign(campana.id);
+
             return campana;
 
         } catch (error) {
@@ -141,6 +157,10 @@ class CampaignService {
             }
 
             await transaction.commit();
+
+            // Sprint 2.3.1: Invalidar caché después de eliminar campaña
+            await cacheService.invalidateCampaign(id);
+
             return true;
 
         } catch (error) {

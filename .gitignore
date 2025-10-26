@@ -31,3 +31,7 @@ uploads/csv/*.csv
 # Build
 dist/
 build/
+logs/
+
+# Tailwind CSS compiled output
+src/public/css/output.css

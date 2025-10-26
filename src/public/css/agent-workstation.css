@@ -1,0 +1,485 @@
+/**
+ * Estilos específicos para la estación de trabajo del agente
+ * Fase 1: Fundamentos Operativos
+ */
+
+/* Layout principal */
+.agent-workstation {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Tarjetas */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    font-weight: 600;
+}
+
+/* Estados del agente */
+.status-display {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.status-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 10px;
+    animation: none;
+    transition: all 0.3s ease;
+}
+
+/* Estados específicos */
+.status-available .status-dot {
+    background-color: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.status-in_call .status-dot {
+    background-color: #17a2b8;
+    box-shadow: 0 0 15px rgba(23, 162, 184, 0.7);
+    animation: pulse 1.5s infinite;
+}
+
+.status-on_pause .status-dot {
+    background-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
+.status-offline .status-dot {
+    background-color: #6c757d;
+}
+
+.status-after_call_work .status-dot {
+    background-color: #6f42c1;
+}
+
+.status-training .status-dot {
+    background-color: #fd7e14;
+}
+
+.status-meeting .status-dot {
+    background-color: #20c997;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Botones de estado */
+.status-controls button {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.status-controls button:hover {
+    transform: translateX(5px);
+}
+
+.status-controls button.active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Controles de pausa */
+.pause-controls {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.pause-controls .form-label {
+    font-weight: 600;
+    color: #856404;
+}
+
+/* Contadores */
+.timer-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.timer-display .form-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.timer-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Métricas */
+.metric-item {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+}
+
+.metric-item:hover {
+    background: #f8f9fa;
+    border-left-color: #0056b3;
+}
+
+.metric-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Panel de cliente */
+#customer-panel {
+    border-left: 5px solid #007bff;
+}
+
+.customer-info h6 {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.customer-info p {
+    background: #e3f2fd;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+/* Panel de llamada */
+#call-panel {
+    border-left: 5px solid #28a745;
+}
+
+.call-controls {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.call-controls button {
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.call-controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.call-metrics {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.call-metrics .row > div {
+    text-align: center;
+    padding: 1rem;
+    border-right: 1px solid #dee2e6;
+}
+
+.call-metrics .row > div:last-child {
+    border-right: none;
+}
+
+/* Panel de IA */
+#ai-assistant .card-header {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.ai-suggestions {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+}
+
+.suggestion-item {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid #2196f3;
+}
+
+.ai-sentiment {
+    margin-bottom: 1rem;
+}
+
+.sentiment-bar {
+    background: #e9ecef;
+    border-radius: 10px;
+    height: 25px;
+    position: relative;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+}
+
+.sentiment-positive {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.sentiment-label {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #495057;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ai-actions .btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Panel de disposiciones */
+#disposition-panel {
+    border-left: 5px solid #6c757d;
+}
+
+.disposition-form {
+    padding: 1rem;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.loading-text {
+    margin-top: 1rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+/* Estados del body */
+body.status-available {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+body.status-in_call {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+body.status-on_pause {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+body.status-offline {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
+/* Indicador de conexión */
+.connection-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.connection-indicator.connected {
+    border-left: 4px solid #28a745;
+}
+
+.connection-indicator.disconnected {
+    border-left: 4px solid #dc3545;
+}
+
+.connection-indicator.connecting {
+    border-left: 4px solid #ffc107;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .agent-workstation .col-md-3 {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .agent-workstation .col-md-9 {
+        width: 100%;
+    }
+
+    .call-controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .call-controls button {
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .timer-value {
+        font-size: 1.2rem;
+    }
+
+    .connection-indicator {
+        top: 10px;
+        right: 10px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-header {
+        font-size: 1rem;
+    }
+
+    .status-indicator {
+        font-size: 0.9rem;
+    }
+
+    .timer-value {
+        font-size: 1rem;
+    }
+
+    .metric-value {
+        font-size: 1rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.status-display,
+.timer-display,
+.metric-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Tooltips */
+.tooltip {
+    font-size: 0.875rem;
+}
+
+.tooltip-inner {
+    background-color: #343a40;
+    color: white;
+}
+
+/* Estados de dispositivos */
+.device-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.device-headset {
+    background: #e3f2fd;
+    color: #2196f3;
+}
+
+.device-phone {
+    background: #f3e5f5;
+    color: #9c27b0;
+}
+
+.device-speaker {
+    background: #e8f5e8;
+    color: #4caf50;
+}
