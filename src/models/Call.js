@@ -118,7 +118,7 @@ export default (sequelize, DataTypes) => {
         durationFormatted: {
             type: DataTypes.VIRTUAL,
             get() {
-                if (!this.duration) return '00:00:00';
+                if (!this.duration) {return '00:00:00';}
                 const hours = Math.floor(this.duration / 3600);
                 const minutes = Math.floor((this.duration % 3600) / 60);
                 const seconds = this.duration % 60;
@@ -128,7 +128,7 @@ export default (sequelize, DataTypes) => {
         billsecFormatted: {
             type: DataTypes.VIRTUAL,
             get() {
-                if (!this.billsec) return '00:00:00';
+                if (!this.billsec) {return '00:00:00';}
                 const hours = Math.floor(this.billsec / 3600);
                 const minutes = Math.floor((this.billsec % 3600) / 60);
                 const seconds = this.billsec % 60;
@@ -268,8 +268,8 @@ export default (sequelize, DataTypes) => {
 
         if (startDate || endDate) {
             where.startTime = {};
-            if (startDate) where.startTime[sequelize.Sequelize.Op.gte] = startDate;
-            if (endDate) where.startTime[sequelize.Sequelize.Op.lte] = endDate;
+            if (startDate) {where.startTime[sequelize.Sequelize.Op.gte] = startDate;}
+            if (endDate) {where.startTime[sequelize.Sequelize.Op.lte] = endDate;}
         }
 
         return await Call.findAndCountAll({
@@ -292,8 +292,8 @@ export default (sequelize, DataTypes) => {
 
         if (startDate || endDate) {
             where.startTime = {};
-            if (startDate) where.startTime[sequelize.Sequelize.Op.gte] = startDate;
-            if (endDate) where.startTime[sequelize.Sequelize.Op.lte] = endDate;
+            if (startDate) {where.startTime[sequelize.Sequelize.Op.gte] = startDate;}
+            if (endDate) {where.startTime[sequelize.Sequelize.Op.lte] = endDate;}
         }
 
         const calls = await Call.findAll({ where });
@@ -332,8 +332,8 @@ export default (sequelize, DataTypes) => {
 
         if (startDate || endDate) {
             where.startTime = {};
-            if (startDate) where.startTime[sequelize.Sequelize.Op.gte] = startDate;
-            if (endDate) where.startTime[sequelize.Sequelize.Op.lte] = endDate;
+            if (startDate) {where.startTime[sequelize.Sequelize.Op.gte] = startDate;}
+            if (endDate) {where.startTime[sequelize.Sequelize.Op.lte] = endDate;}
         }
 
         const calls = await Call.findAll({

@@ -193,7 +193,7 @@ class JWTService {
         };
 
         const match = expiry.match(/^(\d+)([smhd])$/);
-        if (!match) return 15 * 60 * 1000; // Default 15 minutes
+        if (!match) {return 15 * 60 * 1000;} // Default 15 minutes
 
         const [, amount, unit] = match;
         return parseInt(amount) * units[unit];

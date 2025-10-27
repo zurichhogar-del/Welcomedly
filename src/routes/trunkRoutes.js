@@ -5,47 +5,47 @@
 
 import express from 'express';
 import trunkController from '../controllers/trunkController.js';
-import { requireAuth, requireAdmin } from '../middlewares/authMiddleware.js';
-import { createResourceLimiter } from '../middlewares/rateLimitMiddleware.js';
+import { asegurarAutenticacion, asegurarAdmin } from '../middlewares/authMiddleware.js';
+import { createResourceLimiter } from '../middlewares/securityMiddleware.js';
 
 const router = express.Router();
 
 // Todas las rutas requieren autenticación
-router.use(requireAuth);
+router.use(asegurarAutenticacion);
 
 // ==================== VISTAS ====================
 
 // GET /trunks - Listar trunks
-router.get('/', requireAdmin, trunkController.listTrunks);
+router.get('/', asegurarAdmin, trunkController.listTrunks);
 
 // GET /trunks/nuevo - Formulario de creación
-router.get('/nuevo', requireAdmin, trunkController.newTrunk);
+router.get('/nuevo', asegurarAdmin, trunkController.newTrunk);
 
 // POST /trunks - Crear trunk
-router.post('/', requireAdmin, createResourceLimiter, trunkController.createTrunk);
+router.post('/', asegurarAdmin, createResourceLimiter, trunkController.createTrunk);
 
 // GET /trunks/:id - Ver detalles
-router.get('/:id', requireAdmin, trunkController.viewTrunk);
+router.get('/:id', asegurarAdmin, trunkController.viewTrunk);
 
 // GET /trunks/:id/editar - Formulario de edición
-router.get('/:id/editar', requireAdmin, trunkController.editTrunk);
+router.get('/:id/editar', asegurarAdmin, trunkController.editTrunk);
 
 // POST /trunks/:id - Actualizar trunk
-router.post('/:id', requireAdmin, trunkController.updateTrunk);
+router.post('/:id', asegurarAdmin, trunkController.updateTrunk);
 
 // POST /trunks/:id/eliminar - Eliminar trunk
-router.post('/:id/eliminar', requireAdmin, trunkController.deleteTrunk);
+router.post('/:id/eliminar', asegurarAdmin, trunkController.deleteTrunk);
 
 // POST /trunks/:id/test - Probar conexión
-router.post('/:id/test', requireAdmin, trunkController.testTrunk);
+router.post('/:id/test', asegurarAdmin, trunkController.testTrunk);
 
 // ==================== ASIGNACIÓN A CAMPAÑAS ====================
 
 // POST /trunks/:trunkId/assign/:campanaId - Asignar a campaña
-router.post('/:trunkId/assign/:campanaId', requireAdmin, trunkController.assignToCampaign);
+router.post('/:trunkId/assign/:campanaId', asegurarAdmin, trunkController.assignToCampaign);
 
 // POST /trunks/:trunkId/remove/:campanaId - Remover de campaña
-router.post('/:trunkId/remove/:campanaId', requireAdmin, trunkController.removeFromCampaign);
+router.post('/:trunkId/remove/:campanaId', asegurarAdmin, trunkController.removeFromCampaign);
 
 // ==================== API ENDPOINTS ====================
 

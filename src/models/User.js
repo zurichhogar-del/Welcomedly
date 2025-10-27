@@ -97,7 +97,7 @@ export default (sequelize, DataTypes) => {
                         .toLowerCase();
                     
                     if (nombreCompleto) {
-                        let usernameBase = nombreCompleto;
+                        const usernameBase = nombreCompleto;
                         let counter = 1;
                         let usernameFinal = usernameBase;
                         
@@ -107,7 +107,7 @@ export default (sequelize, DataTypes) => {
                                 where: { username: usernameFinal }
                             });
                             
-                            if (!existeUsuario) break;
+                            if (!existeUsuario) {break;}
                             
                             usernameFinal = `${usernameBase}${counter}`;
                             counter++;

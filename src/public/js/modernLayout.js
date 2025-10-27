@@ -86,9 +86,9 @@
      * Close All Dropdowns
      */
     function closeAllDropdowns() {
-        if (notificationsDropdown) notificationsDropdown.classList.add('hidden');
-        if (headerUserDropdown) headerUserDropdown.classList.add('hidden');
-        if (userMenu) userMenu.classList.add('hidden');
+        if (notificationsDropdown) {notificationsDropdown.classList.add('hidden');}
+        if (headerUserDropdown) {headerUserDropdown.classList.add('hidden');}
+        if (userMenu) {userMenu.classList.add('hidden');}
     }
 
     /**
@@ -159,17 +159,17 @@
         // Check if click is outside dropdowns
         if (!event.target.closest('#notifications-toggle') &&
             !event.target.closest('#notifications-dropdown')) {
-            if (notificationsDropdown) notificationsDropdown.classList.add('hidden');
+            if (notificationsDropdown) {notificationsDropdown.classList.add('hidden');}
         }
 
         if (!event.target.closest('#header-user-menu-toggle') &&
             !event.target.closest('#header-user-dropdown')) {
-            if (headerUserDropdown) headerUserDropdown.classList.add('hidden');
+            if (headerUserDropdown) {headerUserDropdown.classList.add('hidden');}
         }
 
         if (!event.target.closest('#user-menu-toggle') &&
             !event.target.closest('#user-menu')) {
-            if (userMenu) userMenu.classList.add('hidden');
+            if (userMenu) {userMenu.classList.add('hidden');}
         }
     }
 

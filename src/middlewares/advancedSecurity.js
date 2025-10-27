@@ -67,10 +67,10 @@ class AdvancedSecurity {
         this.securityConfig = {
             // Rate limiting tiers
             tiers: {
-                public: { windowMs: 15 * 60 * 1000, max: 100 },      // 100 req/15min
-                user: { windowMs: 15 * 60 * 1000, max: 1000 },       // 1000 req/15min
-                premium: { windowMs: 15 * 60 * 1000, max: 5000 },    // 5000 req/15min
-                admin: { windowMs: 15 * 60 * 1000, max: 10000 }      // 10000 req/15min
+                public: { windowMs: 15 * 60 * 1000, max: 100 }, // 100 req/15min
+                user: { windowMs: 15 * 60 * 1000, max: 1000 }, // 1000 req/15min
+                premium: { windowMs: 15 * 60 * 1000, max: 5000 }, // 5000 req/15min
+                admin: { windowMs: 15 * 60 * 1000, max: 10000 } // 10000 req/15min
             },
             // Security headers
             headers: {
@@ -477,7 +477,7 @@ class AdvancedSecurity {
         ];
 
         const checkValue = (value) => {
-            if (typeof value !== 'string') return false;
+            if (typeof value !== 'string') {return false;}
             return sqlPatterns.some(pattern => pattern.test(value));
         };
 
@@ -485,7 +485,7 @@ class AdvancedSecurity {
         const sources = [req.query, req.body, req.params];
 
         for (const source of sources) {
-            if (!source) continue;
+            if (!source) {continue;}
 
             for (const [key, value] of Object.entries(source)) {
                 if (checkValue(value)) {
@@ -520,14 +520,14 @@ class AdvancedSecurity {
         ];
 
         const checkValue = (value) => {
-            if (typeof value !== 'string') return false;
+            if (typeof value !== 'string') {return false;}
             return xssPatterns.some(pattern => pattern.test(value));
         };
 
         const sources = [req.query, req.body, req.params];
 
         for (const source of sources) {
-            if (!source) continue;
+            if (!source) {continue;}
 
             for (const [key, value] of Object.entries(source)) {
                 if (checkValue(value)) {
@@ -562,15 +562,15 @@ class AdvancedSecurity {
         ];
 
         const checkPath = (path) => {
-            if (typeof path !== 'string') return false;
+            if (typeof path !== 'string') {return false;}
             return pathTraversalPatterns.some(pattern => pattern.test(path));
         };
 
         // Check URL and parameters
-        if (checkPath(req.originalUrl)) return true;
+        if (checkPath(req.originalUrl)) {return true;}
 
         for (const [key, value] of Object.entries(req.params)) {
-            if (checkPath(value)) return true;
+            if (checkPath(value)) {return true;}
         }
 
         return false;
@@ -682,7 +682,7 @@ class AdvancedSecurity {
 
     getAllowedOrigins() {
         const origins = process.env.CORS_ORIGINS;
-        if (!origins) return ['http://localhost:3000'];
+        if (!origins) {return ['http://localhost:3000'];}
 
         return origins.split(',').map(origin => origin.trim());
     }
@@ -800,7 +800,7 @@ class AdvancedSecurity {
             statusCodes: {}
         };
 
-        if (logs.length === 0) return stats;
+        if (logs.length === 0) {return stats;}
 
         let totalResponseTime = 0;
         let errorCount = 0;

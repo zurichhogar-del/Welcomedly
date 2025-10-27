@@ -57,7 +57,7 @@ export function fetchWithCSRF(url, options = {}) {
 
 // Para formularios (POST) - agregar campo oculto si no existe
 export function ensureCSRFInForm(form) {
-    if (!form) return;
+    if (!form) {return;}
 
     const existingInput = form.querySelector('input[name="_csrf"]');
     const token = getCSRFToken();

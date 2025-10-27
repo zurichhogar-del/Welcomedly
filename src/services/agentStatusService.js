@@ -16,16 +16,16 @@ class AgentStatusService {
             after_call_work: ['available', 'on_pause', 'offline'],
             on_pause: ['available', 'offline'],
             training: ['available', 'on_pause', 'offline'], // Permitir pausa desde training
-            meeting: ['available', 'on_pause', 'offline']  // Permitir pausa desde meeting
+            meeting: ['available', 'on_pause', 'offline'] // Permitir pausa desde meeting
         };
 
         this.pauseDurationLimits = {
-            bathroom: 600,      // 10 minutos
-            break: 900,         // 15 minutos
-            personal: 1800,     // 30 minutos
-            coaching: 3600,      // 1 hora
-            system_issue: 7200,   // 2 horas
-            lunch: 3600          // 1 hora
+            bathroom: 600, // 10 minutos
+            break: 900, // 15 minutos
+            personal: 1800, // 30 minutos
+            coaching: 3600, // 1 hora
+            system_issue: 7200, // 2 horas
+            lunch: 3600 // 1 hora
         };
     }
 
@@ -806,8 +806,8 @@ class AgentStatusService {
 
             if (startDate || endDate) {
                 where.startTime = {};
-                if (startDate) where.startTime[sequelize.Sequelize.Op.gte] = startDate;
-                if (endDate) where.startTime[sequelize.Sequelize.Op.lte] = endDate;
+                if (startDate) {where.startTime[sequelize.Sequelize.Op.gte] = startDate;}
+                if (endDate) {where.startTime[sequelize.Sequelize.Op.lte] = endDate;}
             }
 
             const history = await AgentStatus.findAll({

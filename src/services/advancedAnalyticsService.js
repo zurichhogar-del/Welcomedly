@@ -25,15 +25,15 @@ class AdvancedAnalyticsService extends EventEmitter {
             dashboards: {
                 executive: {
                     refreshInterval: 300000, // 5 minutos
-                    cacheTimeout: 60000      // 1 minuto
+                    cacheTimeout: 60000 // 1 minuto
                 },
                 operational: {
                     refreshInterval: 15000, // 15 segundos
-                    cacheTimeout: 10000      // 10 segundos
+                    cacheTimeout: 10000 // 10 segundos
                 },
                 realTime: {
-                    refreshInterval: 5000,    // 5 segundos
-                    cacheTimeout: 1000       // 1 segundo
+                    refreshInterval: 5000, // 5 segundos
+                    cacheTimeout: 1000 // 1 segundo
                 }
             },
 
@@ -461,12 +461,12 @@ class AdvancedAnalyticsService extends EventEmitter {
 
     calculateAbandonmentRate(callMetrics) {
         const { total_calls, answered_calls } = callMetrics;
-        if (total_calls === 0) return 0;
+        if (total_calls === 0) {return 0;}
         return ((total_calls - answered_calls) / total_calls);
     }
 
     calculatePerformanceMetrics(callMetrics, agentStatus) {
-        if (!callMetrics || !agentStatus) return null;
+        if (!callMetrics || !agentStatus) {return null;}
 
         const { total_calls, answered_calls, avg_duration } = callMetrics;
         const totalAgents = agentStatus.total || 1;
@@ -611,7 +611,7 @@ class AdvancedAnalyticsService extends EventEmitter {
     }
 
     calculateServiceLevel(totalCalls, totalAgents) {
-        if (totalCalls === 0 || totalAgents === 0) return 0;
+        if (totalCalls === 0 || totalAgents === 0) {return 0;}
         const offeredCalls = totalCalls / totalAgents;
         // Simplificación: Service Level = (Answered / Offered) * 100
         // Aquí necesitaría mayor complejidad con datos reales

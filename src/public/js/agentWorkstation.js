@@ -170,7 +170,7 @@ class AgentWorkstation {
      * Sprint 2.2: Manejar desconexión con reconexión automática y backoff exponencial
      */
     handleDisconnection() {
-        if (this.isReconnecting) return; // Ya estamos intentando reconectar
+        if (this.isReconnecting) {return;} // Ya estamos intentando reconectar
 
         this.isReconnecting = true;
         this.showReconnectionModal();
@@ -485,7 +485,7 @@ class AgentWorkstation {
      * Iniciar tracking de tiempo
      */
     async startTimeTracking() {
-        if (this.productiveTimer) return;
+        if (this.productiveTimer) {return;}
 
         // Sprint 1.2: Obtener métricas iniciales del backend
         await this.loadInitialMetrics();
@@ -536,7 +536,7 @@ class AgentWorkstation {
      * Sprint 1.2: Iniciar sincronización periódica con backend
      */
     startBackendSync() {
-        if (this.syncInterval) return;
+        if (this.syncInterval) {return;}
 
         this.syncInterval = setInterval(async () => {
             await this.syncMetricsWithBackend();

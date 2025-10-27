@@ -6,12 +6,13 @@ import session from 'express-session';
 import RedisStore from 'connect-redis';
 import flash from 'connect-flash';
 import cors from 'cors';
+import compression from 'compression';
 import morgan from 'morgan';
 import sequelize from './database/connection.js';
 import redisClient from './database/redisClient.js';
 import logger from './utils/logger.js';
 import indexRoutes from './routes/index.js';
-import { helmetConfig } from './middlewares/securityMiddleware.js';
+import { helmetConfig, generateCSPNonce } from './middlewares/securityMiddleware.js';
 import { injectCSRFToken, csrfProtection, secureSessionCookie } from './middlewares/csrfMiddleware.js';
 import { notFoundHandler, errorHandler, sequelizeErrorHandler } from './middlewares/errorMiddleware.js';
 import { createServer } from 'http';
@@ -36,6 +37,18 @@ if (missingVars.length > 0) {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
+// Trust Proxy Configuration - MEJORA #1 (100/100)
+// Esencial para producción detrás de load balancers (AWS ELB, Nginx, CloudFlare, etc.)
+if (process.env.NODE_ENV === 'production') {
+    // Confiar en el primer proxy (AWS ELB, Nginx reverso, etc.)
+    app.set('trust proxy', 1);
+    logger.info('Trust proxy habilitado: primer hop', { env: 'production' });
+} else {
+    // En desarrollo, solo confiar en localhost
+    app.set('trust proxy', 'loopback');
+    logger.info('Trust proxy habilitado: loopback', { env: 'development' });
+}
+
 // Configuración básica
 app.set('view engine', 'ejs');
 app.set('views', join(__dirname, 'views'));
@@ -43,10 +56,27 @@ app.use(expressEjsLayouts);
 app.set('layout', './layouts/authLayout');
 
 // Middlewares de seguridad
+// IMPORTANTE: generateCSPNonce debe ir ANTES de helmetConfig
+app.use(generateCSPNonce);
 app.use(helmetConfig);
 app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true
+}));
+
+// Compression Middleware - MEJORA #2 (100/100)
+// Comprime respuestas HTTP con gzip/deflate (reducción 60-80% en tamaño)
+app.use(compression({
+    level: 6, // Balance entre velocidad y ratio de compresión (0-9)
+    threshold: 1024, // Solo comprimir respuestas > 1KB
+    filter: (req, res) => {
+        // No comprimir si el cliente lo solicita explícitamente
+        if (req.headers['x-no-compression']) {
+            return false;
+        }
+        // Usar el filtro por defecto de compression
+        return compression.filter(req, res);
+    }
 }));
 
 // Logging
@@ -106,18 +136,24 @@ const sessionStore = new RedisStore({
 // Guardar sessionStore para uso en WebSocket
 app.set('sessionStore', sessionStore);
 
+// Session Configuration - MEJORA #3 (100/100)
+// Configuración hardened de sesiones para producción
 app.use(session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     rolling: true, // Renovar cookie en cada request
+    name: 'sessionId', // Ocultar que usamos express-session (antes: 'connect.sid')
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
         maxAge: 8 * 60 * 60 * 1000, // 8 horas en milisegundos
-        sameSite: 'lax'
-    }
+        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // Más estricto en prod
+        domain: process.env.COOKIE_DOMAIN || undefined, // Configurar dominio en producción
+        path: '/'
+    },
+    proxy: process.env.NODE_ENV === 'production' // Confiar en proxy en producción
 }));
 
 // Configurar connect-flash
@@ -162,7 +198,7 @@ app.get("/", (req, res) => {
         });
     } catch (error) {
         logger.error('Error en ruta raíz directa', { error: error.message, stack: error.stack });
-        res.status(500).send('Error interno del servidor: ' + error.message);
+        res.status(500).send(`Error interno del servidor: ${ error.message}`);
     }
 });
 
@@ -259,12 +295,59 @@ async function iniciarServidor() {
         // Obtener el session store configurado para pasarlo a WebSocket
         const sessionStore = app.get('sessionStore');
 
+        // Middleware para autenticación WebSocket mejorado (solo en handshake)
+        const onlyForHandshake = (middleware) => {
+            return (req, res, next) => {
+                const isHandshake = req._query.sid === undefined;
+                if (isHandshake) {
+                    middleware(req, res, next);
+                } else {
+                    next();
+                }
+            };
+        };
+
+        // Aplicar middleware de sesión en handshake de Socket.IO
+        io.engine.use(onlyForHandshake(session({
+            store: sessionStore,
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                secure: process.env.NODE_ENV === 'production',
+                httpOnly: true,
+                maxAge: 8 * 60 * 60 * 1000,
+                sameSite: 'lax'
+            }
+        })));
+
+        // Verificar autenticación en handshake
+        io.engine.use(onlyForHandshake((req, res, next) => {
+            if (req.session && req.session.usuario) {
+                logger.debug('WebSocket handshake authenticated', {
+                    userId: req.session.usuario.id,
+                    userName: req.session.usuario.nombre
+                });
+                next();
+            } else {
+                logger.warn('WebSocket handshake rejected - no session', {
+                    ip: req.socket.remoteAddress
+                });
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    error: 'Unauthorized',
+                    message: 'Session required for WebSocket connection'
+                }));
+            }
+        }));
+
         // Inicializar manejadores de WebSocket con session store
         const socketHandlers = new SocketHandlers(io, sessionStore);
 
-        // Exponer io global para acceso desde otros módulos
+        // Exponer io y server global para acceso desde otros módulos y graceful shutdown
         global.io = io;
         global.socketHandlers = socketHandlers;
+        global.httpServer = server;
 
         // Iniciar servidor
         server.listen(PORT, () => {
@@ -300,19 +383,80 @@ async function iniciarServidor() {
 
 iniciarServidor();
 
-// Graceful shutdown
-process.on('SIGINT', async () => {
-    logger.info('📴 Shutting down gracefully...');
-    if (telephonyService.connected) {
-        await telephonyService.shutdown();
+// Graceful shutdown mejorado
+async function gracefulShutdown(signal) {
+    logger.info(`📴 ${signal} received, shutting down gracefully...`);
+
+    try {
+        // 1. Dejar de aceptar nuevas conexiones HTTP
+        if (global.httpServer) {
+            await new Promise((resolve) => {
+                global.httpServer.close(() => {
+                    logger.info('✓ HTTP server closed');
+                    resolve();
+                });
+            });
+        }
+
+        // 2. Cerrar todas las conexiones WebSocket
+        if (global.io) {
+            await new Promise((resolve) => {
+                global.io.close(() => {
+                    logger.info('✓ WebSocket server closed');
+                    resolve();
+                });
+            });
+        }
+
+        // 3. Cerrar servicio de telefonía si está activo
+        if (telephonyService && telephonyService.connected) {
+            await telephonyService.shutdown();
+            logger.info('✓ Telephony service closed');
+        }
+
+        // 4. Cerrar conexión de Redis
+        if (redisClient && redisClient.isOpen) {
+            await redisClient.quit();
+            logger.info('✓ Redis connection closed');
+        }
+
+        // 5. Cerrar conexiones de Sequelize
+        if (sequelize) {
+            await sequelize.close();
+            logger.info('✓ Database connections closed');
+        }
+
+        logger.info('✓ All services closed gracefully');
+        process.exit(0);
+    } catch (error) {
+        logger.error('Error during graceful shutdown:', {
+            error: error.message,
+            stack: error.stack
+        });
+        process.exit(1);
     }
-    process.exit(0);
+}
+
+// Manejar señales de terminación
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+
+// Manejar excepciones no capturadas
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', {
+        promise,
+        reason: reason instanceof Error ? reason.message : reason,
+        stack: reason instanceof Error ? reason.stack : undefined
+    });
 });
 
-process.on('SIGTERM', async () => {
-    logger.info('📴 Shutting down gracefully...');
-    if (telephonyService.connected) {
-        await telephonyService.shutdown();
-    }
-    process.exit(0);
+process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception:', {
+        error: error.message,
+        stack: error.stack
+    });
+    // Dar tiempo para que el logger escriba antes de salir
+    setTimeout(() => {
+        process.exit(1);
+    }, 1000);
 });

@@ -1,20 +1,30 @@
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import crypto from 'crypto';
 
-// Configuración de Helmet para seguridad general
+// Middleware para generar nonce CSP único por request
+export const generateCSPNonce = (req, res, next) => {
+    res.locals.cspNonce = crypto.randomBytes(32).toString('hex');
+    next();
+};
+
+// Configuración de Helmet para seguridad general con CSP mejorado (sin 'unsafe-inline')
 export const helmetConfig = helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: [
                 "'self'",
-                "'unsafe-inline'",
+                // Eliminar 'unsafe-inline' y usar nonce
+                (req, res) => `'nonce-${res.locals.cspNonce}'`,
                 "https://cdn.jsdelivr.net",
-                "https://cdnjs.cloudflare.com"
+                "https://cdnjs.cloudflare.com",
+                "https://fonts.googleapis.com"
             ],
             scriptSrc: [
                 "'self'",
-                "'unsafe-inline'",
+                // Eliminar 'unsafe-inline' y usar nonce
+                (req, res) => `'nonce-${res.locals.cspNonce}'`,
                 "https://cdn.jsdelivr.net",
                 "https://code.jquery.com",
                 "https://cdnjs.cloudflare.com"
@@ -25,6 +35,7 @@ export const helmetConfig = helmet({
                 "ws://localhost:*",
                 "http://localhost:*",
                 "https://localhost:*",
+                "wss://localhost:*",
                 "https://cdn.jsdelivr.net",
                 "https://cdnjs.cloudflare.com"
             ],
@@ -33,7 +44,8 @@ export const helmetConfig = helmet({
                 "https:",
                 "data:",
                 "https://cdnjs.cloudflare.com",
-                "https://fonts.googleapis.com"
+                "https://fonts.googleapis.com",
+                "https://fonts.gstatic.com"
             ],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
@@ -41,10 +53,18 @@ export const helmetConfig = helmet({
             childSrc: ["'none'"],
             workerSrc: ["'self'", "blob:"],
             manifestSrc: ["'self'"],
-            upgradeInsecureRequests: []
+            upgradeInsecureRequests: [],
+            // CSP Report URI - MEJORA #5 (100/100)
+            // Monitoreo de violaciones CSP para debugging y seguridad
+            reportUri: ['/api/csp-report']
         },
     },
     crossOriginEmbedderPolicy: false,
+    strictTransportSecurity: {
+        maxAge: 31536000, // 1 año
+        includeSubDomains: true,
+        preload: true
+    }
 });
 
 // Rate Limiter general para toda la aplicación

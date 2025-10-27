@@ -5,13 +5,13 @@
 
 import express from 'express';
 import telephonyController from '../controllers/telephonyController.js';
-import { requireAuth } from '../middlewares/authMiddleware.js';
-import { createResourceLimiter } from '../middlewares/rateLimitMiddleware.js';
+import { asegurarAutenticacion } from '../middlewares/authMiddleware.js';
+import { createResourceLimiter } from '../middlewares/securityMiddleware.js';
 
 const router = express.Router();
 
 // Apply authentication middleware to all routes
-router.use(requireAuth);
+router.use(asegurarAutenticacion);
 
 // Call Control
 router.post('/call/originate', createResourceLimiter, telephonyController.originateCall);

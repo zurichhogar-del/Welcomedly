@@ -153,7 +153,7 @@ export const validate = (schema) => {
     return (req, res, next) => {
         const { error, value } = schema.validate(req.body, {
             abortEarly: false, // Retornar todos los errores
-            stripUnknown: true  // Remover campos desconocidos
+            stripUnknown: true // Remover campos desconocidos
         });
 
         if (error) {

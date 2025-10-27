@@ -301,7 +301,7 @@ class AnalyticsDashboard {
                 document.getElementById('campaign-contacted').textContent = metrics.leads.contacted;
                 document.getElementById('campaign-successful').textContent = metrics.calls.successful;
                 document.getElementById('campaign-conversion-rate').textContent =
-                    metrics.conversion.rate + '%';
+                    `${metrics.conversion.rate }%`;
 
                 // Show sections
                 document.getElementById('campaign-metrics-section').style.display = 'flex';

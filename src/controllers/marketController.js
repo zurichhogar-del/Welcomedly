@@ -88,7 +88,7 @@ export async function eliminarFormulario(req, res) {
 export async function mostrarEditarFormulario(req, res) {
     try {
         const formulario = await Formulario.findByPk(req.params.id);
-        if (!formulario) throw new Error("Formulario no encontrado");
+        if (!formulario) {throw new Error("Formulario no encontrado");}
         
         res.render('marketViews/editar_formulario', { formulario });
     } catch (error) {
@@ -147,12 +147,12 @@ export async function mostrarFormularioCampana(req, res) {
 export const crearCampana = async (req, res) => {
     const { nombre, formularioVenta, agentes } = req.body;
     const archivoCSV = req.file;
-    let registros = [];
-    let erroresCSV = [];
+    const registros = [];
+    const erroresCSV = [];
 
     try {
         // Validaciones básicas
-        if (!archivoCSV) throw new Error('Debes subir un archivo CSV');
+        if (!archivoCSV) {throw new Error('Debes subir un archivo CSV');}
         if (!agentes || !Array.isArray(agentes) || agentes.length === 0) {
             throw new Error('Selecciona al menos un agente');
         }
@@ -225,7 +225,7 @@ export const crearCampana = async (req, res) => {
                 Se encontraron ${erroresCSV.length} errores:
                 ${erroresCSV.map(e => `• Línea ${e.línea}: ${e.error}`).join('\n')}
             `;
-            if (fs.existsSync(csvPath)) fs.unlinkSync(csvPath);
+            if (fs.existsSync(csvPath)) {fs.unlinkSync(csvPath);}
             return res.redirect('/market/crear-campana');
         }
 
@@ -255,13 +255,13 @@ export const crearCampana = async (req, res) => {
             }
 
             await transaction.commit();
-            if (fs.existsSync(csvPath)) fs.unlinkSync(csvPath); // Limpiar archivo
+            if (fs.existsSync(csvPath)) {fs.unlinkSync(csvPath);} // Limpiar archivo
             req.session.mensajeExito = `✅ Campaña "${nombre}" creada (${registros.length} contactos)`;
             res.redirect('/campaign/campanas');
 
         } catch (error) {
             await transaction.rollback();
-            if (fs.existsSync(csvPath)) fs.unlinkSync(csvPath);
+            if (fs.existsSync(csvPath)) {fs.unlinkSync(csvPath);}
             throw new Error(`Error en base de datos: ${error.message}`);
         }
 

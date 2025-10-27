@@ -287,8 +287,8 @@ class TelephonyService extends EventEmitter {
                         CALL_ID: callId
                     }
                 }, (err, res) => {
-                    if (err) reject(err);
-                    else resolve(res);
+                    if (err) {reject(err);}
+                    else {resolve(res);}
                 });
             });
 
@@ -333,8 +333,8 @@ class TelephonyService extends EventEmitter {
                     action: 'Hangup',
                     channel
                 }, (err, res) => {
-                    if (err) reject(err);
-                    else resolve(res);
+                    if (err) {reject(err);}
+                    else {resolve(res);}
                 });
             });
 
@@ -355,8 +355,8 @@ class TelephonyService extends EventEmitter {
                     action: 'SIPshowpeer',
                     peer
                 }, (err, res) => {
-                    if (err) reject(err);
-                    else resolve(res);
+                    if (err) {reject(err);}
+                    else {resolve(res);}
                 });
             });
 
@@ -376,8 +376,8 @@ class TelephonyService extends EventEmitter {
                 this.ami.action({
                     action: 'CoreShowChannels'
                 }, (err, res) => {
-                    if (err) reject(err);
-                    else resolve(res);
+                    if (err) {reject(err);}
+                    else {resolve(res);}
                 });
             });
 
@@ -394,7 +394,7 @@ class TelephonyService extends EventEmitter {
     async saveCallRecord(callData) {
         try {
             // Find or create call record
-            let call = await Call.findOne({ where: { callId: callData.callId } });
+            const call = await Call.findOne({ where: { callId: callData.callId } });
 
             if (call) {
                 // Update existing record

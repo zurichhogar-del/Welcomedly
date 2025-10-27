@@ -740,7 +740,7 @@ class SoftphoneUI {
             // Update fields
             const updateElement = (id, value) => {
                 const el = document.getElementById(id);
-                if (el) el.textContent = value || 'N/A';
+                if (el) {el.textContent = value || 'N/A';}
             };
 
             updateElement('customer-name', customer.nombre);

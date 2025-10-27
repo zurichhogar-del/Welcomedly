@@ -167,7 +167,7 @@ class AIAssistant {
                 <div class="d-flex align-items-start">
                     <i class="fas fa-comment-dots text-primary me-2 mt-1"></i>
                     <div style="flex: 1;">
-                        <strong>${suggestion.title || 'Sugerencia ' + (index + 1)}</strong>
+                        <strong>${suggestion.title || `Sugerencia ${ index + 1}`}</strong>
                         <p class="mb-0 small">${this.escapeHtml(suggestion.text || suggestion)}</p>
                     </div>
                 </div>
@@ -261,12 +261,12 @@ class AIAssistant {
      */
     updateStatus(status) {
         const statusBadge = document.getElementById('ai-status');
-        if (!statusBadge) return;
+        if (!statusBadge) {return;}
 
         statusBadge.textContent = status;
 
         const panel = document.querySelector('.ai-assistant-panel');
-        if (!panel) return;
+        if (!panel) {return;}
 
         if (status === 'Analizando...') {
             panel.classList.add('ai-processing');

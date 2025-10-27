@@ -11,14 +11,14 @@ class QualityManagementService {
         this.config = {
             // Criterios de evaluación ponderados
             evaluationCriteria: {
-                opening: { weight: 15, maxScore: 15 },      // Apertura profesional
-                empathy: { weight: 20, maxScore: 20 },       // Empatía
-                activeListening: { weight: 15, maxScore: 15 },  // Escucha activa
+                opening: { weight: 15, maxScore: 15 }, // Apertura profesional
+                empathy: { weight: 20, maxScore: 20 }, // Empatía
+                activeListening: { weight: 15, maxScore: 15 }, // Escucha activa
                 problemSolving: { weight: 25, maxScore: 25 }, // Resolución de problemas
                 productKnowledge: { weight: 15, maxScore: 15 }, // Conocimiento de productos
-                callControl: { weight: 10, maxScore: 10 },     // Control de la llamada
-                compliance: { weight: 10, maxScore: 10 },       // Cumplimiento normativo
-                closing: { weight: 10, maxScore: 10 }          // Cierre efectivo
+                callControl: { weight: 10, maxScore: 10 }, // Control de la llamada
+                compliance: { weight: 10, maxScore: 10 }, // Cumplimiento normativo
+                closing: { weight: 10, maxScore: 10 } // Cierre efectivo
             },
 
             // Reglas de compliance

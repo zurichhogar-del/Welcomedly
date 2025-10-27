@@ -6,7 +6,7 @@ import agentStatusController from '../controllers/agentStatusController.js';
 const router = express.Router();
 
 // Middleware para asegurar que el usuario está autenticado
-const ensureAuthenticated = (req, res, next) => {
+const asegurarAutenticacion = (req, res, next) => {
     if (req.session && req.session.usuario) {
         return next();
     }
@@ -53,7 +53,7 @@ const ensureSupervisor = (req, res, next) => {
  *         description: Estado actualizado correctamente
  */
 router.post('/status',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     loginLimiter,
     [
         body('status')
@@ -96,7 +96,7 @@ router.post('/status',
  *         description: Pausa iniciada correctamente
  */
 router.post('/pause/start',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         body('pauseType')
             .isIn(['bathroom', 'lunch', 'break', 'coaching', 'system_issue', 'personal'])
@@ -122,7 +122,7 @@ router.post('/pause/start',
  *         description: Pausa finalizada correctamente
  */
 router.post('/pause/end',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     agentStatusController.endPause
 );
 
@@ -149,7 +149,7 @@ router.post('/pause/end',
  *         description: Sesión iniciada correctamente
  */
 router.post('/session/start',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         body('campaignId')
             .optional()
@@ -187,7 +187,7 @@ router.post('/session/start',
  *         description: Sesión finalizada correctamente
  */
 router.post('/session/end',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         body('callsHandled')
             .optional()
@@ -232,13 +232,13 @@ router.post('/session/end',
  */
 // Ruta sin agentId (usa usuario actual)
 router.get('/status',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     agentStatusController.getCurrentStatus
 );
 
 // Ruta con agentId específico
 router.get('/status/:agentId',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         param('agentId')
             .isInt({ min: 1 })
@@ -276,7 +276,7 @@ router.get('/status/:agentId',
  */
 // Productividad del usuario actual
 router.get('/productivity',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         query('period')
             .optional()
@@ -288,7 +288,7 @@ router.get('/productivity',
 
 // Productividad de agente específico
 router.get('/productivity/:agentId',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         param('agentId')
             .isInt({ min: 1 })
@@ -316,7 +316,7 @@ router.get('/productivity/:agentId',
  *         description: Acceso denegado
  */
 router.get('/realtime-metrics',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     ensureSupervisor,
     agentStatusController.getRealtimeMetrics
 );
@@ -363,7 +363,7 @@ router.get('/realtime-metrics',
  */
 // Historial del usuario actual
 router.get('/history',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         query('startDate')
             .optional()
@@ -387,7 +387,7 @@ router.get('/history',
 
 // Historial de agente específico
 router.get('/history/:agentId',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         param('agentId')
             .isInt({ min: 1 })
@@ -426,13 +426,13 @@ router.get('/history/:agentId',
  */
 // Métricas del usuario actual
 router.get('/metrics/current',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     agentStatusController.getCurrentMetrics
 );
 
 // Métricas de agente específico
 router.get('/metrics/current/:agentId',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     [
         param('agentId')
             .isInt({ min: 1 })
@@ -454,7 +454,7 @@ router.get('/metrics/current/:agentId',
  *         description: Sesión activa con métricas
  */
 router.get('/session/active',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     agentStatusController.getActiveSessionForRecovery
 );
 
@@ -471,7 +471,7 @@ router.get('/session/active',
  *         description: Estado en vivo del agente
  */
 router.get('/live-status',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     agentStatusController.getLiveStatus
 );
 
@@ -490,7 +490,7 @@ router.get('/live-status',
  *         description: Acceso denegado
  */
 router.get('/supervisor/dashboard',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     ensureSupervisor,
     agentStatusController.showSupervisorDashboard
 );
@@ -510,7 +510,7 @@ router.get('/supervisor/dashboard',
  *         description: Acceso denegado
  */
 router.get('/supervisor/metrics',
-    ensureAuthenticated,
+    asegurarAutenticacion,
     ensureSupervisor,
     agentStatusController.getSupervisorMetrics
 );

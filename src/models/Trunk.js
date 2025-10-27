@@ -179,14 +179,14 @@ export default (sequelize, DataTypes) => {
         successRate: {
             type: DataTypes.VIRTUAL,
             get() {
-                if (this.totalCalls === 0) return 0;
+                if (this.totalCalls === 0) {return 0;}
                 return ((this.successfulCalls / this.totalCalls) * 100).toFixed(2);
             }
         },
         failureRate: {
             type: DataTypes.VIRTUAL,
             get() {
-                if (this.totalCalls === 0) return 0;
+                if (this.totalCalls === 0) {return 0;}
                 return ((this.failedCalls / this.totalCalls) * 100).toFixed(2);
             }
         }

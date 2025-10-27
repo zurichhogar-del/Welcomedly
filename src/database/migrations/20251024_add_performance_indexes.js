@@ -24,7 +24,7 @@ export default {
             });
             console.log('✅ Índice idx_usuarios_rol_estado creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_usuarios_rol_estado ya existe');
         }
 
@@ -36,7 +36,7 @@ export default {
             });
             console.log('✅ Índice idx_usuarios_username creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_usuarios_username ya existe');
         }
 
@@ -49,7 +49,7 @@ export default {
             `);
             console.log('✅ Índice idx_base_campanas_campana_disposicion creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_base_campanas_campana_disposicion ya existe');
         }
 
@@ -62,7 +62,7 @@ export default {
             `);
             console.log('✅ Índice idx_base_campanas_ultima_llamada creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_base_campanas_ultima_llamada ya existe');
         }
 
@@ -74,7 +74,7 @@ export default {
             `);
             console.log('✅ Índice GIN idx_base_campanas_otros_campos_gin creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice GIN idx_base_campanas_otros_campos_gin ya existe');
         }
 
@@ -88,7 +88,7 @@ export default {
             });
             console.log('✅ Índice idx_disposiciones_activa_orden creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_disposiciones_activa_orden ya existe');
         }
 
@@ -99,7 +99,7 @@ export default {
             });
             console.log('✅ Índice idx_disposiciones_tipo_activa creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_disposiciones_tipo_activa ya existe');
         }
 

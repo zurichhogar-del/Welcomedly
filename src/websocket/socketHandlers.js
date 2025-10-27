@@ -536,7 +536,7 @@ class SocketHandlers {
      * Sprint 1.1: Manejo mejorado de cookies firmadas
      */
     extractSessionId(cookieString) {
-        if (!cookieString) return null;
+        if (!cookieString) {return null;}
 
         try {
             // Formato típico de express-session con firma: "connect.sid=s%3A[sessionId].[signature]"
@@ -550,7 +550,7 @@ class SocketHandlers {
                 return null;
             }
 
-            let cookieValue = decodeURIComponent(cookieMatch[1]);
+            const cookieValue = decodeURIComponent(cookieMatch[1]);
 
             // Si la cookie está firmada (comienza con s:), extraer el valor sin firma
             if (cookieValue.startsWith('s:')) {

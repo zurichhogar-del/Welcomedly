@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 export const upload = multer({ 
     storage,
     fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'text/csv') cb(null, true);
-        else cb(new Error('Solo se permiten archivos CSV'), false);
+        if (file.mimetype === 'text/csv') {cb(null, true);}
+        else {cb(new Error('Solo se permiten archivos CSV'), false);}
     }
 });

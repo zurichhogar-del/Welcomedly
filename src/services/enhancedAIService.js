@@ -18,7 +18,8 @@ class EnhancedAIService {
         });
 
         // Modelos de análisis de sentimiento
-        this.sentimentAnalyzer = new natural.SentimentAnalyzer('Spanish');
+        // Natural requiere idioma, stemmer y vocabulario (afinn, senticon, pattern)
+        this.sentimentAnalyzer = new natural.SentimentAnalyzer('English', natural.PorterStemmer, 'afinn');
         this.tokenizer = new natural.WordTokenizer();
 
         // Cache para respuestas y análisis
@@ -419,8 +420,8 @@ Predice la siguiente mejor acción considerando:
         const positiveCount = tokens.filter(t => positiveWords.includes(t)).length;
         const negativeCount = tokens.filter(t => negativeWords.includes(t)).length;
 
-        if (positiveCount > negativeCount) return { sentiment: 'positive', score: 0.7 };
-        if (negativeCount > positiveCount) return { sentiment: 'negative', score: -0.7 };
+        if (positiveCount > negativeCount) {return { sentiment: 'positive', score: 0.7 };}
+        if (negativeCount > positiveCount) {return { sentiment: 'negative', score: -0.7 };}
         return { sentiment: 'neutral', score: 0 };
     }
 
@@ -526,8 +527,8 @@ Basado en tu conocimiento de productos y servicios de telecomunicaciones:
         const combinedScore = (naturalScore * 0.3 + aiScore * 0.7);
 
         let sentiment = 'neutral';
-        if (combinedScore > 0.2) sentiment = 'positive';
-        else if (combinedScore < -0.2) sentiment = 'negative';
+        if (combinedScore > 0.2) {sentiment = 'positive';}
+        else if (combinedScore < -0.2) {sentiment = 'negative';}
 
         return {
             sentiment,
@@ -737,14 +738,14 @@ Basado en tu conocimiento de productos y servicios de telecomunicaciones:
      * Analizar patrones de speech
      */
     analyzeSpeechPatterns(transcript) {
-        if (!transcript) return [];
+        if (!transcript) {return [];}
 
         const patterns = [];
         const words = transcript.toLowerCase().split(/\s+/);
 
         // Detectar patrones de velocidad
-        if (words.length > 200) patterns.push({ type: 'fast_speech', severity: 'medium' });
-        if (words.length < 50) patterns.push({ type: 'slow_speech', severity: 'low' });
+        if (words.length > 200) {patterns.push({ type: 'fast_speech', severity: 'medium' });}
+        if (words.length < 50) {patterns.push({ type: 'slow_speech', severity: 'low' });}
 
         // Detectar pausas largas (simulado)
         patterns.push({ type: 'long_pauses', count: Math.floor(Math.random() * 3) });
@@ -756,7 +757,7 @@ Basado en tu conocimiento de productos y servicios de telecomunicaciones:
      * Extraer palabras clave
      */
     extractKeywords(transcript) {
-        if (!transcript) return [];
+        if (!transcript) {return [];}
 
         const keywords = [];
         const importantWords = ['problema', 'solución', 'acuerdo', 'compromiso', 'siguiente', 'llamar', 'consultar'];
@@ -774,7 +775,7 @@ Basado en tu conocimiento de productos y servicios de telecomunicaciones:
      * Evaluar claridad del speech
      */
     assessSpeechClarity(transcript) {
-        if (!transcript) return 0;
+        if (!transcript) {return 0;}
 
         const words = transcript.split(/\s+/);
         const longWords = words.filter(word => word.length > 8).length;
@@ -790,11 +791,11 @@ Basado en tu conocimiento de productos y servicios de telecomunicaciones:
         let score = 80; // Base score
 
         // Ajustar basado en duración
-        if (callData.duration > 180) score += 5; // Bonificación por llamadas largas
-        if (callData.duration < 30) score -= 10; // Penalización por llamadas muy cortas
+        if (callData.duration > 180) {score += 5;} // Bonificación por llamadas largas
+        if (callData.duration < 30) {score -= 10;} // Penalización por llamadas muy cortas
 
         // Ajustar basado en transcripción
-        if (callData.transcript && callData.transcript.length > 100) score += 10;
+        if (callData.transcript && callData.transcript.length > 100) {score += 10;}
 
         return Math.min(100, score);
     }

@@ -362,7 +362,7 @@ class CampaignService {
             return callbacks;
 
         } catch (error) {
-            throw new Error('Error al obtener callbacks pendientes: ' + error.message);
+            throw new Error(`Error al obtener callbacks pendientes: ${ error.message}`);
         }
     }
 
@@ -397,7 +397,7 @@ class CampaignService {
             return registros;
 
         } catch (error) {
-            throw new Error('Error al obtener registros por disposición: ' + error.message);
+            throw new Error(`Error al obtener registros por disposición: ${ error.message}`);
         }
     }
 

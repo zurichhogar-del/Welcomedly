@@ -1,7 +1,7 @@
 import express from 'express';
 import { query, validationResult } from 'express-validator';
 import { loginLimiter } from '../middlewares/securityMiddleware.js';
-import { ensureAuthenticated, ensureSupervisor } from '../middlewares/authMiddleware.js';
+import { asegurarAutenticacion, ensureSupervisor } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ const responseWrapper = (req, res, next) => {
 };
 
 // Middleware to protect all routes
-router.use(ensureAuthenticated);
+router.use(asegurarAutenticacion);
 router.use(responseWrapper);
 
 /**

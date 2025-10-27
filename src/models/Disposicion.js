@@ -24,10 +24,10 @@ export default (sequelize, DataTypes) => {
         },
         tipo: {
             type: DataTypes.ENUM(
-                'EXITOSA',      // Venta cerrada, Objetivo logrado
-                'NO_CONTACTO',  // No contesta, Ocupado, Número equivocado
-                'SEGUIMIENTO',  // Volver a llamar, Enviar información
-                'NO_EXITOSA'    // No interesado, No califica
+                'EXITOSA', // Venta cerrada, Objetivo logrado
+                'NO_CONTACTO', // No contesta, Ocupado, Número equivocado
+                'SEGUIMIENTO', // Volver a llamar, Enviar información
+                'NO_EXITOSA' // No interesado, No califica
             ),
             allowNull: false,
             defaultValue: 'NO_CONTACTO'

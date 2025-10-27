@@ -1,8 +1,8 @@
+import createError from 'http-errors';
+
 // Middleware para manejar errores 404 (rutas no encontradas)
 export const notFoundHandler = (req, res, next) => {
-    const error = new Error(`Ruta no encontrada - ${req.originalUrl}`);
-    error.status = 404;
-    next(error);
+    next(createError(404, `Ruta no encontrada - ${req.originalUrl}`));
 };
 
 // Middleware centralizado de manejo de errores

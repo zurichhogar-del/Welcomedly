@@ -1,11 +1,11 @@
 import express from 'express';
 import analyticsController from '../controllers/analyticsController.js';
-import { requireAuth } from '../middlewares/authMiddleware.js';
+import { asegurarAutenticacion } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 // Aplicar autenticación a todas las rutas
-router.use(requireAuth);
+router.use(asegurarAutenticacion);
 
 // Dashboard principal
 router.get('/dashboard', analyticsController.renderDashboard);

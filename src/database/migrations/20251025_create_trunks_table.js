@@ -151,7 +151,7 @@ export default {
             });
             console.log('✅ Tabla trunks creada');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Tabla trunks ya existe');
         }
 
@@ -170,7 +170,7 @@ export default {
             });
             console.log('✅ Columna trunk_id agregada a tabla calls');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Columna trunk_id ya existe en calls');
         }
 
@@ -182,7 +182,7 @@ export default {
             });
             console.log('✅ Índice idx_trunks_name creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_trunks_name ya existe');
         }
 
@@ -192,7 +192,7 @@ export default {
             });
             console.log('✅ Índice idx_trunks_status_registered creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_trunks_status_registered ya existe');
         }
 
@@ -202,7 +202,7 @@ export default {
             });
             console.log('✅ Índice idx_trunks_priority_status creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_trunks_priority_status ya existe');
         }
 
@@ -212,7 +212,7 @@ export default {
             });
             console.log('✅ Índice idx_trunks_provider creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_trunks_provider ya existe');
         }
 
@@ -222,7 +222,7 @@ export default {
             });
             console.log('✅ Índice idx_calls_trunk_id creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_calls_trunk_id ya existe');
         }
 
@@ -273,7 +273,7 @@ export default {
             });
             console.log('✅ Tabla campaign_trunks creada');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Tabla campaign_trunks ya existe');
         }
 
@@ -284,7 +284,7 @@ export default {
             });
             console.log('✅ Índice idx_campaign_trunks_unique creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_campaign_trunks_unique ya existe');
         }
 

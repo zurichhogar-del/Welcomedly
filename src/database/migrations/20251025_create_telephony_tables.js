@@ -123,7 +123,7 @@ export default {
             });
             console.log('✅ Tabla calls creada');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Tabla calls ya existe');
         }
 
@@ -204,7 +204,7 @@ export default {
             });
             console.log('✅ Tabla sip_peers creada');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Tabla sip_peers ya existe');
         }
 
@@ -217,7 +217,7 @@ export default {
             });
             console.log('✅ Índice idx_calls_call_id creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_calls_call_id ya existe');
         }
 
@@ -228,7 +228,7 @@ export default {
             });
             console.log('✅ Índice idx_calls_agent_starttime creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_calls_agent_starttime ya existe');
         }
 
@@ -239,7 +239,7 @@ export default {
             });
             console.log('✅ Índice idx_calls_campaign_disposition creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_calls_campaign_disposition ya existe');
         }
 
@@ -250,7 +250,7 @@ export default {
             });
             console.log('✅ Índice idx_calls_lead_id creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_calls_lead_id ya existe');
         }
 
@@ -262,7 +262,7 @@ export default {
             });
             console.log('✅ Índice idx_sip_peers_username creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_sip_peers_username ya existe');
         }
 
@@ -274,7 +274,7 @@ export default {
             });
             console.log('✅ Índice idx_sip_peers_extension creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_sip_peers_extension ya existe');
         }
 
@@ -285,7 +285,7 @@ export default {
             });
             console.log('✅ Índice idx_sip_peers_status_registered creado');
         } catch (error) {
-            if (!error.message.includes('already exists')) throw error;
+            if (!error.message.includes('already exists')) {throw error;}
             console.log('⚠️  Índice idx_sip_peers_status_registered ya existe');
         }
 

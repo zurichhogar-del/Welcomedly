@@ -13,15 +13,15 @@ class PredictiveDialerService extends EventEmitter {
         // Configuración de marcación
         this.config = {
             // Parámetros ajustables
-            targetAnswerRate: 0.35,           // 35% tasa de respuesta
-            maxAbandonRate: 0.03,           // 3% abandono máximo
-            minTalkTime: 45,                // 45 segundos mínimo
-            lookBackWindow: 60,              // 60 segundos ventana de análisis
-            adjustmentInterval: 5000,           // 5 segundos para ajustes
-            maxPredictiveRatio: 3.5,         // 3.5 llamadas por agente
-            minPredictiveRatio: 1.2,          // 1.2 llamadas por agente mínimo
-            amdThreshold: 0.95,              // 95% confianza para detección
-            dncFilterDays: 30,                // 30 días para filtro DNC
+            targetAnswerRate: 0.35, // 35% tasa de respuesta
+            maxAbandonRate: 0.03, // 3% abandono máximo
+            minTalkTime: 45, // 45 segundos mínimo
+            lookBackWindow: 60, // 60 segundos ventana de análisis
+            adjustmentInterval: 5000, // 5 segundos para ajustes
+            maxPredictiveRatio: 3.5, // 3.5 llamadas por agente
+            minPredictiveRatio: 1.2, // 1.2 llamadas por agente mínimo
+            amdThreshold: 0.95, // 95% confianza para detección
+            dncFilterDays: 30, // 30 días para filtro DNC
 
             // Límites de marcación
             maxCallsPerSecond: 10,
@@ -29,9 +29,9 @@ class PredictiveDialerService extends EventEmitter {
             maxCallsPerHour: 10000,
 
             // Timeouts
-            callTimeout: 60000,               // 60 segundos
-            ringTimeout: 15000,               // 15 segundos
-            amdTimeout: 3000                  // 3 segundos para AMD
+            callTimeout: 60000, // 60 segundos
+            ringTimeout: 15000, // 15 segundos
+            amdTimeout: 3000 // 3 segundos para AMD
         };
 
         // Estado del dialer
@@ -645,7 +645,7 @@ class PredictiveDialerService extends EventEmitter {
     }
 
     calculateTrend(history) {
-        if (history.length < 3) return 0;
+        if (history.length < 3) {return 0;}
 
         const recent = history.slice(-3).reduce((a, b) => a + b) / 3;
         const older = history.slice(-6, -3).reduce((a, b) => a + b) / 3;
@@ -1059,7 +1059,7 @@ class PredictiveDialerService extends EventEmitter {
     }
 
     calculateTrend(values) {
-        if (values.length < 2) return 'stable';
+        if (values.length < 2) {return 'stable';}
 
         const first = values[0];
         const last = values[values.length - 1];

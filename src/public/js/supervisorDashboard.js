@@ -106,7 +106,7 @@ function updateSummaryCards(summary) {
 
     // Eficiencia promedio
     updateCardValue('avg-efficiency', summary.avgEfficiency);
-    document.getElementById('efficiency-bar').style.width = summary.avgEfficiency + '%';
+    document.getElementById('efficiency-bar').style.width = `${summary.avgEfficiency }%`;
 
     // Total de llamadas
     updateCardValue('total-calls', summary.totalCalls);
@@ -123,7 +123,7 @@ function updateSummaryCards(summary) {
  */
 function updateCardValue(elementId, newValue) {
     const element = document.getElementById(elementId);
-    if (!element) return;
+    if (!element) {return;}
 
     const oldValue = element.textContent;
 
@@ -238,8 +238,8 @@ function getStatusBadgeClass(status) {
  * Obtiene la clase CSS para el badge de eficiencia
  */
 function getEfficiencyClass(efficiency) {
-    if (efficiency >= 80) return 'efficiency-high';
-    if (efficiency >= 60) return 'efficiency-medium';
+    if (efficiency >= 80) {return 'efficiency-high';}
+    if (efficiency >= 60) {return 'efficiency-medium';}
     return 'efficiency-low';
 }
 
@@ -247,7 +247,7 @@ function getEfficiencyClass(efficiency) {
  * Formatea una duración en segundos a formato legible
  */
 function formatDuration(seconds) {
-    if (!seconds || seconds === 0) return '0m';
+    if (!seconds || seconds === 0) {return '0m';}
 
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);

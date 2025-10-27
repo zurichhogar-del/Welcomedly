@@ -11,12 +11,15 @@ import logger from '../utils/logger.js';
 /**
  * Crear key personalizada para rate limiting
  * Usa userId si está autenticado, sino usa IP
+ * Compatible con IPv6 usando el default key generator
  */
-const createRateLimitKey = (req) => {
+const createRateLimitKey = (req, res) => {
     if (req.session?.usuario?.id) {
         return `ratelimit:user:${req.session.usuario.id}`;
     }
-    return `ratelimit:ip:${req.ip}`;
+    // Para IPs, dejar que express-rate-limit use su generador por defecto
+    // que maneja IPv6 correctamente
+    return undefined;
 };
 
 /**
@@ -87,15 +90,16 @@ export const advancedLoginLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     store: createRedisStore('login'),
-    keyGenerator: (req) => `ratelimit:login:${req.ip}`, // Siempre por IP para login
+    // Usar default keyGenerator para manejo correcto de IPv6
     skipSuccessfulRequests: true, // No contar logins exitosos
-    handler: (req, res) => rateLimitHandler(req, res, 'login'),
-    onLimitReached: (req, res, options) => {
+    handler: (req, res) => {
+        // Logging integrado en el handler (onLimitReached está deprecated)
         logger.error('Login rate limit reached - possible brute force attack', {
             ip: req.ip,
             username: req.body.correo || req.body.username,
             userAgent: req.get('user-agent')
         });
+        rateLimitHandler(req, res, 'login');
     }
 });
 
