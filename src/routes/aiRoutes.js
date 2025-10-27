@@ -22,6 +22,19 @@ router.post('/api/suggest-responses', aiLimiter, suggestResponses);
 router.post('/api/customer-info', aiLimiter, lookupCustomerInfo);
 router.get('/api/status', checkAIStatus);
 
+// Sprint 3.2: Real-time AI Assistant Routes
+import {
+    getRealtimeSuggestions,
+    transcribeAudio,
+    analyzeSentiment,
+    summarizeCall
+} from '../controllers/aiController.js';
+
+router.post('/suggestions/realtime', aiLimiter, getRealtimeSuggestions);
+router.post('/transcribe', aiLimiter, transcribeAudio);
+router.post('/analyze-sentiment', aiLimiter, analyzeSentiment);
+router.post('/summarize-call', aiLimiter, summarizeCall);
+
 // Ruta para la vista del asistente AI
 router.get('/assistant', showAIAssistant);
 

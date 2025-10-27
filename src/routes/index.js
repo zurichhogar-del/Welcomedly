@@ -19,6 +19,7 @@ import rateLimitRoutes from './rateLimitRoutes.js' // ✅ Sprint 2.4.3: Rate Lim
 import componentsRoutes from './componentsRoutes.js' // ✅ Sprint 3.0: Components Showcase
 import telephonyRoutes from './telephonyRoutes.js' // ✅ Sprint 3.1.3: Telephony API
 import analyticsRoutes from './analyticsRoutes.js' // ✅ Sprint 3.3: Analytics y Reportes
+import trunkRoutes from './trunkRoutes.js' // ✅ Sprint 3.1.6: Trunk Management
 import { csrfProtection } from '../middlewares/csrfMiddleware.js'
 
 // Importar authJwtRoutes (comentado temporalmente hasta que esté implementado)
@@ -87,6 +88,7 @@ router.use("/ai", aiRoutes)
 router.use("/components", componentsRoutes) // ✅ Sprint 3.0: Components Showcase
 router.use("/api/telephony", telephonyRoutes) // ✅ Sprint 3.1.3: Telephony API
 router.use("/analytics", analyticsRoutes) // ✅ Sprint 3.3: Analytics y Reportes
+router.use("/trunks", trunkRoutes) // ✅ Sprint 3.1.6: Trunk Management
 // router.use("/api/ai", aiEnhancedRoutes) // ❌ COMENTADO: Archivo no existe
 router.use("/api/agent", agentStatusRoutes)
 // router.use("/api/dialer", predictiveDialerRoutes) // ⚠️ COMENTADO: Dependencias faltantes

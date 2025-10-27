@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="/css/agent-workstation.css">
     <!-- Softphone CSS - Sprint 3.1.4 -->
     <link rel="stylesheet" href="/css/softphone.css">
+    <!-- AI Assistant Panel CSS - Sprint 3.2 -->
+    <link rel="stylesheet" href="/css/ai-assistant-panel.css">
 </head>
 <body class="agent-workstation" data-agent-id="<%= session.usuario.id %>" data-agent-name="<%= session.usuario.nombre %>">
 
@@ -245,43 +247,44 @@
                     </div>
                 </div>
 
-                <!-- Panel de Asistente IA -->
-                <div class="card mb-3">
-                    <div class="card-header bg-warning text-dark">
-                        <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Asistente IA</h5>
+                <!-- Panel de Asistente IA - Sprint 3.2 -->
+                <div class="card mb-3 ai-assistant-panel">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-robot me-2"></i>Asistente IA
+                            <span class="badge bg-light text-dark ms-2" id="ai-status">Listo</span>
+                        </h5>
                     </div>
                     <div class="card-body">
-                        <div class="ai-suggestions mb-3">
-                            <h6>Sugerencias en Tiempo Real:</h6>
-                            <div id="ai-suggestions" class="alert alert-info">
-                                <!-- Se llenará dinámicamente con sugerencias IA -->
-                                <div class="suggestion-item">
-                                    <i class="fas fa-lightbulb me-2"></i>
-                                    Menciona nuestro soporte 24/7 disponible
+                        <!-- Botón solicitar sugerencias -->
+                        <button class="btn btn-primary w-100 mb-3" id="btn-get-suggestions">
+                            <i class="fas fa-lightbulb me-2"></i>Solicitar Sugerencias
+                        </button>
+
+                        <!-- Análisis de sentimiento -->
+                        <div class="sentiment-display mb-3" id="sentiment-display">
+                            <label class="form-label">Sentimiento del Cliente:</label>
+                            <div class="sentiment-indicator">
+                                <span class="badge sentiment-neutral" id="sentiment-badge">Neutral</span>
+                                <div class="progress mt-2">
+                                    <div class="progress-bar" id="sentiment-bar" style="width: 0%"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="ai-sentiment mb-3">
-                            <h6>Análisis de Sentimiento:</h6>
-                            <div class="sentiment-bar">
-                                <div class="sentiment-positive" style="width: 75%"></div>
-                                <span class="sentiment-label">Positivo (75%)</span>
+                        <!-- Sugerencias -->
+                        <div class="suggestions-container" id="suggestions-container">
+                            <label class="form-label">Sugerencias:</label>
+                            <div class="suggestions-list" id="suggestions-list">
+                                <p class="text-muted small">Haz clic en "Solicitar Sugerencias" durante una llamada</p>
                             </div>
                         </div>
 
-                        <div class="ai-actions">
-                            <h6>Acciones Sugeridas:</h6>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-handshake me-1"></i>Ofrecer upgrade
-                                </button>
-                                <button class="btn btn-outline-success btn-sm">
-                                    <i class="fas fa-tag me-1"></i>Aplicar descuento
-                                </button>
-                                <button class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-book me-1"></i>Buscar conocimiento
-                                </button>
+                        <!-- Transcripción en vivo -->
+                        <div class="transcription-container mt-3" id="transcription-container" style="display: none;">
+                            <label class="form-label">Transcripción:</label>
+                            <div class="transcription-text" id="transcription-text">
+                                <!-- Texto transcrito aparecerá aquí -->
                             </div>
                         </div>
                     </div>
@@ -362,6 +365,8 @@
     <script type="module" src="/js/softphone-ui.js"></script>
     <script type="module" src="/js/softphone-agent-integration.js"></script>
     <script src="/js/agentWorkstation.js"></script>
+    <!-- AI Assistant - Sprint 3.2 -->
+    <script src="/js/aiAssistant.js"></script>
 
     <script>
         // Variables globales para el template

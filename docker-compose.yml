@@ -38,6 +38,34 @@ services:
     networks:
       - welcomedly-network
 
+  # Asterisk PBX for Telephony (Sprint 3.1.4)
+  asterisk:
+    image: andrius/asterisk:20
+    container_name: welcomedly-asterisk
+    ports:
+      - "5038:5038"   # AMI
+      - "8089:8089"   # WebSocket WSS
+      - "5060:5060/udp"   # SIP UDP
+      - "10000-10099:10000-10099/udp"  # RTP
+    volumes:
+      - ./docker/asterisk/manager.conf:/etc/asterisk/manager.conf:ro
+      - ./docker/asterisk/pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./docker/asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./docker/asterisk/queues.conf:/etc/asterisk/queues.conf:ro
+      - asterisk-sounds:/var/lib/asterisk/sounds
+      - asterisk-monitor:/var/spool/asterisk/monitor
+    environment:
+      - ASTERISK_UID=1000
+      - ASTERISK_GID=1000
+    healthcheck:
+      test: ["CMD", "asterisk", "-rx", "core show version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - welcomedly-network
+    restart: unless-stopped
+
   # App Instance 1
   app1:
     build:
@@ -58,11 +86,19 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       SESSION_SECRET: ${SESSION_SECRET}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ASTERISK_HOST: asterisk
+      ASTERISK_PORT: 5038
+      ASTERISK_USER: welcomedly
+      ASTERISK_PASSWORD: ${ASTERISK_PASSWORD:-welcomedly_secret_2025}
+      ASTERISK_WSS_HOST: ${ASTERISK_WSS_HOST:-localhost}
+      ASTERISK_WSS_PORT: 8089
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      asterisk:
+        condition: service_started
     networks:
       - welcomedly-network
     restart: unless-stopped
@@ -87,11 +123,19 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       SESSION_SECRET: ${SESSION_SECRET}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ASTERISK_HOST: asterisk
+      ASTERISK_PORT: 5038
+      ASTERISK_USER: welcomedly
+      ASTERISK_PASSWORD: ${ASTERISK_PASSWORD:-welcomedly_secret_2025}
+      ASTERISK_WSS_HOST: ${ASTERISK_WSS_HOST:-localhost}
+      ASTERISK_WSS_PORT: 8089
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      asterisk:
+        condition: service_started
     networks:
       - welcomedly-network
     restart: unless-stopped
@@ -116,11 +160,19 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD:-}
       SESSION_SECRET: ${SESSION_SECRET}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ASTERISK_HOST: asterisk
+      ASTERISK_PORT: 5038
+      ASTERISK_USER: welcomedly
+      ASTERISK_PASSWORD: ${ASTERISK_PASSWORD:-welcomedly_secret_2025}
+      ASTERISK_WSS_HOST: ${ASTERISK_WSS_HOST:-localhost}
+      ASTERISK_WSS_PORT: 8089
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+      asterisk:
+        condition: service_started
     networks:
       - welcomedly-network
     restart: unless-stopped
@@ -156,4 +208,8 @@ volumes:
   postgres-data:
     driver: local
   redis-data:
+    driver: local
+  asterisk-sounds:
+    driver: local
+  asterisk-monitor:
     driver: local

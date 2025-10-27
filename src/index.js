@@ -20,6 +20,7 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import SocketHandlers from './websocket/socketHandlers.js';
 import metricsSyncJob from './jobs/metricsSync.js';
 import { redisClient as redisClientConfig, connectRedis, isRedisAvailable } from './config/redis.js';
+import telephonyService from './services/telephonyService.js';
 import 'dotenv/config';
 
 // Validar variables de entorno críticas
@@ -184,6 +185,27 @@ async function iniciarServidor() {
         // No ejecutar sync para evitar errores de constraints
         console.log('✅ Base de datos conectada correctamente');
 
+        // Sprint 3.1.4: Inicializar servicio de telefonía (si está configurado)
+        if (process.env.ASTERISK_HOST) {
+            try {
+                await telephonyService.initialize();
+                logger.info('✅ Telephony service initialized', {
+                    component: 'telephony',
+                    asterisk: `${process.env.ASTERISK_HOST}:${process.env.ASTERISK_PORT}`
+                });
+            } catch (error) {
+                logger.error('❌ Failed to initialize telephony service:', {
+                    component: 'telephony',
+                    error: error.message
+                });
+                logger.warn('⚠️  Continuing without telephony...', { component: 'telephony' });
+            }
+        } else {
+            logger.info('⚠️  Telephony disabled (ASTERISK_HOST not configured)', {
+                component: 'telephony'
+            });
+        }
+
         const PORT = process.env.PORT || 3000;
 
         // Crear servidor HTTP para soporte WebSocket
@@ -277,3 +299,20 @@ async function iniciarServidor() {
 }
 
 iniciarServidor();
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+    logger.info('📴 Shutting down gracefully...');
+    if (telephonyService.connected) {
+        await telephonyService.shutdown();
+    }
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    logger.info('📴 Shutting down gracefully...');
+    if (telephonyService.connected) {
+        await telephonyService.shutdown();
+    }
+    process.exit(0);
+});

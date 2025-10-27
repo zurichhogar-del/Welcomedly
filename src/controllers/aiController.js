@@ -1,6 +1,7 @@
 import aiService from '../services/aiService.js';
-// import enhancedAIService from '../services/enhancedAIService.js'; // ⚠️ COMENTADO: Errores de inicialización
+import enhancedAIService from '../services/enhancedAIService.js';
 import { asegurarAutenticacion } from '../middlewares/authMiddleware.js';
+import logger from '../utils/logger.js';
 
 /**
  * Controlador para funcionalidades AI de asistencia a agentes
@@ -476,6 +477,118 @@ export async function getQualityStats(req, res) {
         res.status(500).json({
             success: false,
             message: 'Failed to get quality statistics'
+        });
+    }
+}
+
+// =================== Sprint 3.2: Real-time AI Assistant Controllers ===================
+
+/**
+ * Sprint 3.2: Obtener sugerencias en tiempo real
+ */
+export async function getRealtimeSuggestions(req, res) {
+    try {
+        const { callId, customerMessage, callDuration, previousContext, agentId, campaignId } = req.body;
+        const userId = req.session.usuario?.id || agentId;
+
+        const context = {
+            agentId: userId,
+            callId,
+            customerMessage: customerMessage || 'Sin mensaje del cliente',
+            callDuration: callDuration || 0,
+            campaignId,
+            previousContext
+        };
+
+        logger.info('Sprint 3.2: Solicitando sugerencias en tiempo real', { context });
+
+        const result = await enhancedAIService.getRealTimeAssistance(context);
+
+        res.json({
+            success: true,
+            suggestions: result.suggestions || [
+                { title: 'Sugerencia 1', text: 'Mantén un tono amable y profesional' },
+                { title: 'Sugerencia 2', text: 'Pregunta sobre necesidades específicas del cliente' },
+                { title: 'Sugerencia 3', text: 'Ofrece soluciones personalizadas' }
+            ],
+            sentiment: result.sentiment || { type: 'neutral', confidence: 0.5 },
+            context: result.context
+        });
+
+    } catch (error) {
+        logger.error('Error en getRealtimeSuggestions', { error: error.message });
+        res.status(500).json({
+            success: false,
+            error: 'Error al obtener sugerencias'
+        });
+    }
+}
+
+/**
+ * Sprint 3.2: Transcribir audio
+ */
+export async function transcribeAudio(req, res) {
+    try {
+        const { audioBuffer } = req.body;
+        const userId = req.session.usuario?.id;
+
+        if (!audioBuffer) {
+            return res.status(400).json({
+                success: false,
+                error: 'Se requiere audioBuffer'
+            });
+        }
+
+        logger.info('Sprint 3.2: Transcribiendo audio', { userId });
+
+        const transcription = await enhancedAIService.transcribeAudio(audioBuffer);
+
+        res.json({
+            success: true,
+            text: transcription.text,
+            confidence: transcription.confidence || 0.9
+        });
+
+    } catch (error) {
+        logger.error('Error en transcribeAudio', { error: error.message });
+        res.status(500).json({
+            success: false,
+            error: 'Error al transcribir audio'
+        });
+    }
+}
+
+/**
+ * Sprint 3.2: Resumir llamada
+ */
+export async function summarizeCall(req, res) {
+    try {
+        const { callId, callData } = req.body;
+        const userId = req.session.usuario?.id;
+
+        if (!callData) {
+            return res.status(400).json({
+                success: false,
+                error: 'Se requieren datos de llamada'
+            });
+        }
+
+        logger.info('Sprint 3.2: Generando resumen de llamada', { callId, userId });
+
+        const summary = await enhancedAIService.generateCallSummary(callData);
+
+        res.json({
+            success: true,
+            summary: summary.summary || summary,
+            callId,
+            generatedAt: new Date().toISOString()
+        });
+
+    } catch (error) {
+        logger.error('Error en summarizeCall', { error: error.message });
+        res.status(500).json({
+            success: false,
+            error: 'Error al generar resumen'
         });
     }
 }

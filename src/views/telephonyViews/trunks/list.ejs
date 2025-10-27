@@ -1,0 +1,243 @@
+<!-- Vista de Listado de Troncales SIP - Sprint 3.1.6 -->
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Gestión de Troncales SIP</h1>
+                <a href="/trunks/nuevo" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nueva Troncal
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <% if (trunks && trunks.length > 0) { %>
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Proveedor</th>
+                                        <th>Host</th>
+                                        <th>Tipo</th>
+                                        <th class="text-center">Canales</th>
+                                        <th class="text-center">Prioridad</th>
+                                        <th class="text-center">Estado</th>
+                                        <th>Campañas</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% trunks.forEach(trunk => { %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= trunk.name %></strong>
+                                                <% if (trunk.description) { %>
+                                                    <br><small class="text-muted"><%= trunk.description %></small>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    <%= trunk.provider %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <code class="small"><%= trunk.host %>:<%= trunk.port %></code>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    <%= trunk.trunkType.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-light text-dark">
+                                                    <%= trunk.maxChannels %>
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <%= trunk.priority %>
+                                            </td>
+                                            <td class="text-center">
+                                                <% if (trunk.status === 'active') { %>
+                                                    <span class="badge bg-success">Activa</span>
+                                                <% } else if (trunk.status === 'inactive') { %>
+                                                    <span class="badge bg-secondary">Inactiva</span>
+                                                <% } else if (trunk.status === 'maintenance') { %>
+                                                    <span class="badge bg-warning">Mantenimiento</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-danger">Error</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (trunk.campaigns && trunk.campaigns.length > 0) { %>
+                                                    <div class="d-flex flex-wrap gap-1">
+                                                        <% trunk.campaigns.slice(0, 2).forEach(campaign => { %>
+                                                            <span class="badge bg-primary small"
+                                                                  title="<%= campaign.nombre %>">
+                                                                <%= campaign.nombre.substring(0, 15) %><%= campaign.nombre.length > 15 ? '...' : '' %>
+                                                            </span>
+                                                        <% }); %>
+                                                        <% if (trunk.campaigns.length > 2) { %>
+                                                            <span class="badge bg-light text-dark small">
+                                                                +<%= trunk.campaigns.length - 2 %>
+                                                            </span>
+                                                        <% } %>
+                                                    </div>
+                                                <% } else { %>
+                                                    <small class="text-muted">Sin campañas</small>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="/trunks/<%= trunk.id %>"
+                                                       class="btn btn-outline-primary"
+                                                       title="Ver detalles">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="/trunks/<%= trunk.id %>/editar"
+                                                       class="btn btn-outline-warning"
+                                                       title="Editar">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <button type="button"
+                                                            class="btn btn-outline-info"
+                                                            onclick="testTrunk('<%= trunk.id %>', '<%= trunk.name %>')"
+                                                            title="Probar conexión">
+                                                        <i class="bi bi-lightning"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger"
+                                                            onclick="deleteTrunk('<%= trunk.id %>', '<%= trunk.name %>')"
+                                                            title="Eliminar">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+                    <h4>No hay troncales configuradas</h4>
+                    <p class="mb-3">Las troncales SIP permiten conectar con proveedores de telefonía externos como Twilio, Vonage, etc.</p>
+                    <a href="/trunks/nuevo" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Crear Primera Troncal
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<script>
+// Test trunk connection
+async function testTrunk(trunkId, trunkName) {
+    try {
+        const result = await Swal.fire({
+            title: 'Probando conexión',
+            text: `Verificando conectividad con ${trunkName}...`,
+            icon: 'info',
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const response = await fetch(`/trunks/${trunkId}/test`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content
+            }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            Swal.fire({
+                title: 'Conexión exitosa',
+                text: data.data.message,
+                icon: 'success'
+            });
+        } else {
+            throw new Error(data.error || 'Error al probar conexión');
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Error',
+            text: `No se pudo conectar: ${error.message}`,
+            icon: 'error'
+        });
+    }
+}
+
+// Delete trunk
+async function deleteTrunk(trunkId, trunkName) {
+    const result = await Swal.fire({
+        title: '¿Eliminar troncal?',
+        html: `¿Estás seguro de eliminar la troncal <strong>${trunkName}</strong>?<br><small class="text-muted">Esta acción no se puede deshacer.</small>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/trunks/${trunkId}/eliminar`;
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = document.querySelector('meta[name="csrf-token"]')?.content || '';
+            form.appendChild(csrfInput);
+
+            document.body.appendChild(form);
+            form.submit();
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: `No se pudo eliminar: ${error.message}`,
+                icon: 'error'
+            });
+        }
+    }
+}
+</script>
+
+<style>
+.table td {
+    vertical-align: middle;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+}
+</style>

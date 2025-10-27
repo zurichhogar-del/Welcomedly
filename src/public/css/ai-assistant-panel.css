@@ -1,0 +1,344 @@
+/**
+ * Sprint 3.2: AI Assistant Panel Styles
+ * Estilos para el panel de asistencia IA en Agent Workstation
+ */
+
+.ai-assistant-panel {
+    border-left: 4px solid #0d6efd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ai-assistant-panel .card-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border-bottom: none;
+}
+
+/* Sentiment Indicator */
+.sentiment-indicator {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.sentiment-indicator .badge {
+    font-size: 14px;
+    padding: 8px 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sentiment-positive {
+    background-color: #198754 !important;
+    color: white !important;
+}
+
+.sentiment-negative {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.sentiment-neutral {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+/* Progress bar para confianza del sentimiento */
+.sentiment-indicator .progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+}
+
+.sentiment-indicator .progress-bar {
+    transition: width 0.6s ease, background-color 0.3s ease;
+    border-radius: 4px;
+}
+
+/* Suggestions List */
+.suggestions-container {
+    margin-top: 16px;
+}
+
+.suggestions-container .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.suggestions-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 12px;
+    background: #ffffff;
+}
+
+/* Scrollbar personalizado */
+.suggestions-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.suggestions-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb {
+    background: #0d6efd;
+    border-radius: 3px;
+}
+
+.suggestions-list::-webkit-scrollbar-thumb:hover {
+    background: #0a58ca;
+}
+
+.suggestion-item {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.suggestion-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+    border-color: #0d6efd;
+    box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
+}
+
+.suggestion-item:active {
+    transform: translateX(3px);
+}
+
+.suggestion-item .fa-comment-dots {
+    font-size: 18px;
+}
+
+.suggestion-item strong {
+    display: block;
+    color: #212529;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.suggestion-item p {
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+/* Empty state */
+.suggestions-list .text-muted {
+    text-align: center;
+    padding: 20px;
+    color: #adb5bd !important;
+}
+
+/* Transcription Container */
+.transcription-container {
+    margin-top: 16px;
+}
+
+.transcription-container .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.transcription-text {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 12px;
+    background: #ffffff;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Scrollbar para transcripción */
+.transcription-text::-webkit-scrollbar {
+    width: 6px;
+}
+
+.transcription-text::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.transcription-text::-webkit-scrollbar-thumb {
+    background: #0d6efd;
+    border-radius: 3px;
+}
+
+.transcription-line {
+    margin-bottom: 8px;
+    padding: 8px;
+    border-left: 3px solid #0d6efd;
+    background: #f8f9fa;
+    border-radius: 4px;
+    animation: slideIn 0.3s ease;
+}
+
+.transcription-line strong {
+    color: #0d6efd;
+    margin-right: 6px;
+}
+
+/* AI Status Badge */
+#ai-status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Processing animation */
+.ai-processing #ai-status {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Button solicitar sugerencias */
+#btn-get-suggestions {
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(13, 110, 253, 0.3);
+    transition: all 0.2s ease;
+}
+
+#btn-get-suggestions:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+}
+
+#btn-get-suggestions:active {
+    transform: translateY(0);
+}
+
+#btn-get-suggestions:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Loading spinner dentro del botón */
+#btn-get-suggestions .spinner-border {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ai-assistant-panel {
+        margin-top: 16px;
+    }
+
+    .suggestions-list {
+        max-height: 200px;
+    }
+
+    .transcription-text {
+        max-height: 150px;
+    }
+}
+
+/* Dark mode support (opcional) */
+@media (prefers-color-scheme: dark) {
+    .ai-assistant-panel {
+        background-color: #212529;
+        color: #f8f9fa;
+    }
+
+    .suggestions-list,
+    .transcription-text {
+        background: #343a40;
+        border-color: #495057;
+        color: #f8f9fa;
+    }
+
+    .suggestion-item {
+        background: #495057;
+        color: #f8f9fa;
+    }
+
+    .suggestion-item:hover {
+        background: #6c757d;
+    }
+
+    .transcription-line {
+        background: #495057;
+        border-left-color: #0d6efd;
+    }
+}
+
+/* Tooltip para sugerencias */
+.suggestion-item[data-tooltip] {
+    position: relative;
+}
+
+.suggestion-item[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #212529;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+/* Copy feedback */
+.suggestion-item.copied {
+    background: #198754;
+    color: white;
+    border-color: #198754;
+}
+
+.suggestion-item.copied::before {
+    content: "✓ Copiado";
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    font-size: 12px;
+    font-weight: 600;
+}

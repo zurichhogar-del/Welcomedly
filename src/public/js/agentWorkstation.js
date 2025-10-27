@@ -1,6 +1,6 @@
 /**
- * Sistema de workstation para agentes - Fase 1
- * Gestiona tiempo productivo, pausas y estado del agente
+ * Sistema de workstation para agentes - Fase 1 + Sprint 2.2
+ * Gestiona tiempo productivo, pausas y estado del agente con recuperación automática
  */
 class AgentWorkstation {
     constructor() {
@@ -18,6 +18,15 @@ class AgentWorkstation {
             calls: 0,
             sales: 0
         };
+
+        // Sprint 2.2: Variables para reconexión robusta
+        this.reconnectionAttempts = 0;
+        this.maxReconnectionAttempts = 10;
+        this.baseReconnectionDelay = 1000; // 1 segundo
+        this.maxReconnectionDelay = 30000; // 30 segundos
+        this.isReconnecting = false;
+        this.reconnectionTimer = null;
+        this.wasConnected = false;
 
         this.init();
     }
@@ -65,7 +74,7 @@ class AgentWorkstation {
 
     /**
      * Conectar a WebSocket
-     * Sprint 2.2: Con reconnection automática
+     * Sprint 2.2: Con reconnection automática y backoff exponencial
      */
     async connectWebSocket() {
         return new Promise((resolve, reject) => {
@@ -74,15 +83,20 @@ class AgentWorkstation {
                     transports: ['websocket', 'polling'],
                     upgrade: true,
                     rememberUpgrade: true,
-                    // Sprint 2.2: Configuración de reconnection
-                    reconnection: true,
-                    reconnectionDelay: 1000,
-                    reconnectionDelayMax: 5000,
-                    reconnectionAttempts: Infinity
+                    // Sprint 2.2: Deshabilitar reconexión automática de Socket.IO
+                    // Usaremos nuestra propia lógica con backoff exponencial
+                    reconnection: false,
+                    timeout: 10000
                 });
 
                 this.socket.on('connect', () => {
                     console.log('✅ Conectado al servidor WebSocket');
+                    this.wasConnected = true;
+                    this.reconnectionAttempts = 0;
+                    this.isReconnecting = false;
+
+                    // Ocultar modal de reconexión si estaba visible
+                    this.hideReconnectionModal();
 
                     // Autenticar con sesión actual
                     this.socket.emit('authenticate', {
@@ -125,27 +139,202 @@ class AgentWorkstation {
                     this.showError(data.message || 'Error de conexión');
                 });
 
-                this.socket.on('disconnect', () => {
-                    console.warn('⚠️ Desconectado del servidor WebSocket');
-                    this.showWarning('Conexión perdida. Intentando reconectar...');
-                });
+                // Sprint 2.2: Manejar desconexión con reconexión automática
+                this.socket.on('disconnect', (reason) => {
+                    console.warn('⚠️ Desconectado del servidor WebSocket. Razón:', reason);
 
-                // Sprint 2.2: Recuperar estado al reconectar
-                this.socket.on('reconnect', async () => {
-                    console.log('🔄 Reconectado, recuperando estado...');
-                    await this.recoverActiveSession();
-                    this.showSuccess('Conexión restaurada');
+                    // Solo intentar reconectar si la desconexión no fue intencional
+                    if (reason !== 'io client disconnect' && this.wasConnected) {
+                        this.handleDisconnection();
+                    }
                 });
 
                 this.socket.on('connect_error', (error) => {
                     console.error('❌ Error de conexión WebSocket:', error);
-                    reject(error);
+
+                    // Si ya estábamos conectados antes, intentar reconectar
+                    if (this.wasConnected) {
+                        this.handleDisconnection();
+                    } else {
+                        reject(error);
+                    }
                 });
 
             } catch (error) {
                 reject(error);
             }
         });
+    }
+
+    /**
+     * Sprint 2.2: Manejar desconexión con reconexión automática y backoff exponencial
+     */
+    handleDisconnection() {
+        if (this.isReconnecting) return; // Ya estamos intentando reconectar
+
+        this.isReconnecting = true;
+        this.showReconnectionModal();
+
+        this.attemptReconnection();
+    }
+
+    /**
+     * Sprint 2.2: Intentar reconexión con backoff exponencial
+     */
+    async attemptReconnection() {
+        if (this.reconnectionAttempts >= this.maxReconnectionAttempts) {
+            console.error('❌ Máximo de intentos de reconexión alcanzado');
+            this.showReconnectionError();
+            return;
+        }
+
+        this.reconnectionAttempts++;
+
+        // Calcular delay con backoff exponencial: delay = baseDelay * 2^attempts
+        const delay = Math.min(
+            this.baseReconnectionDelay * Math.pow(2, this.reconnectionAttempts - 1),
+            this.maxReconnectionDelay
+        );
+
+        console.log(`🔄 Intento de reconexión ${this.reconnectionAttempts}/${this.maxReconnectionAttempts} en ${delay}ms...`);
+
+        this.updateReconnectionModal(this.reconnectionAttempts, delay);
+
+        // Esperar el delay antes de intentar reconectar
+        this.reconnectionTimer = setTimeout(async () => {
+            try {
+                // Intentar reconectar el socket
+                this.socket.connect();
+
+                // Esperar un momento para verificar si la conexión fue exitosa
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                if (!this.socket.connected) {
+                    // Si no se conectó, intentar de nuevo
+                    this.attemptReconnection();
+                } else {
+                    // Conexión exitosa - recuperar sesión
+                    console.log('🔄 Reconectado exitosamente, recuperando estado...');
+                    await this.recoverActiveSession();
+                    this.hideReconnectionModal();
+                    this.showSuccess('Conexión restaurada correctamente');
+                }
+
+            } catch (error) {
+                console.error('Error en intento de reconexión:', error);
+                this.attemptReconnection();
+            }
+        }, delay);
+    }
+
+    /**
+     * Sprint 2.2: Mostrar modal de reconexión
+     */
+    showReconnectionModal() {
+        // Crear modal si no existe
+        let modal = document.getElementById('reconnection-modal');
+
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'reconnection-modal';
+            modal.className = 'reconnection-modal';
+            modal.innerHTML = `
+                <div class="reconnection-content">
+                    <div class="reconnection-spinner"></div>
+                    <h3>Conexión perdida</h3>
+                    <p id="reconnection-message">Intentando reconectar...</p>
+                    <p id="reconnection-attempt" class="text-muted">Intento 1</p>
+                    <button id="manual-reconnect-btn" class="btn btn-primary btn-sm" style="display: none;">
+                        Reintentar ahora
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Event listener para botón de reintento manual
+            document.getElementById('manual-reconnect-btn').addEventListener('click', () => {
+                this.cancelReconnection();
+                this.reconnectionAttempts = 0;
+                this.attemptReconnection();
+            });
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    /**
+     * Sprint 2.2: Actualizar modal de reconexión
+     */
+    updateReconnectionModal(attempt, delay) {
+        const attemptEl = document.getElementById('reconnection-attempt');
+        const messageEl = document.getElementById('reconnection-message');
+
+        if (attemptEl) {
+            attemptEl.textContent = `Intento ${attempt}/${this.maxReconnectionAttempts}`;
+        }
+
+        if (messageEl) {
+            const seconds = Math.ceil(delay / 1000);
+            messageEl.textContent = `Reconectando en ${seconds} segundo${seconds !== 1 ? 's' : ''}...`;
+        }
+    }
+
+    /**
+     * Sprint 2.2: Ocultar modal de reconexión
+     */
+    hideReconnectionModal() {
+        const modal = document.getElementById('reconnection-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    /**
+     * Sprint 2.2: Mostrar error de reconexión (máximo de intentos alcanzado)
+     */
+    showReconnectionError() {
+        const messageEl = document.getElementById('reconnection-message');
+        const attemptEl = document.getElementById('reconnection-attempt');
+        const manualBtn = document.getElementById('manual-reconnect-btn');
+
+        if (messageEl) {
+            messageEl.textContent = 'No se pudo restablecer la conexión';
+            messageEl.className = 'text-danger';
+        }
+
+        if (attemptEl) {
+            attemptEl.textContent = 'Verifica tu conexión a internet';
+        }
+
+        if (manualBtn) {
+            manualBtn.style.display = 'block';
+        }
+
+        // Mostrar alerta al usuario
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Conexión',
+                text: 'No se pudo restablecer la conexión con el servidor. Por favor, recarga la página.',
+                showCancelButton: true,
+                confirmButtonText: 'Recargar página',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+    /**
+     * Sprint 2.2: Cancelar intento de reconexión en curso
+     */
+    cancelReconnection() {
+        if (this.reconnectionTimer) {
+            clearTimeout(this.reconnectionTimer);
+            this.reconnectionTimer = null;
+        }
     }
 
     /**

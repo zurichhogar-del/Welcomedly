@@ -1,0 +1,352 @@
+<!-- Formulario de Troncal SIP - Sprint 3.1.6 -->
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">
+                    <%= action === 'create' ? 'Nueva Troncal SIP' : 'Editar Troncal SIP' %>
+                </h1>
+                <a href="/trunks" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="POST" action="<%= action === 'create' ? '/trunks' : `/trunks/${trunk.id}` %>" id="trunkForm">
+                <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+                <!-- Información Básica -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle"></i> Información Básica</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="name"
+                                       name="name"
+                                       value="<%= trunk ? trunk.name : '' %>"
+                                       required
+                                       maxlength="100"
+                                       placeholder="Ej: Trunk Twilio Principal">
+                                <div class="form-text">Nombre descriptivo de la troncal</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="provider" class="form-label">Proveedor <span class="text-danger">*</span></label>
+                                <select class="form-select"
+                                        id="provider"
+                                        name="provider"
+                                        required>
+                                    <option value="">Seleccionar proveedor</option>
+                                    <option value="twilio" <%= trunk && trunk.provider === 'twilio' ? 'selected' : '' %>>Twilio</option>
+                                    <option value="vonage" <%= trunk && trunk.provider === 'vonage' ? 'selected' : '' %>>Vonage</option>
+                                    <option value="bandwidth" <%= trunk && trunk.provider === 'bandwidth' ? 'selected' : '' %>>Bandwidth</option>
+                                    <option value="telnyx" <%= trunk && trunk.provider === 'telnyx' ? 'selected' : '' %>>Telnyx</option>
+                                    <option value="plivo" <%= trunk && trunk.provider === 'plivo' ? 'selected' : '' %>>Plivo</option>
+                                    <option value="other" <%= trunk && trunk.provider === 'other' ? 'selected' : '' %>>Otro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descripción</label>
+                            <textarea class="form-control"
+                                      id="description"
+                                      name="description"
+                                      rows="2"
+                                      maxlength="255"
+                                      placeholder="Descripción opcional de la troncal"><%= trunk ? (trunk.description || '') : '' %></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="trunkType" class="form-label">Tipo de Troncal</label>
+                                <select class="form-select"
+                                        id="trunkType"
+                                        name="trunkType">
+                                    <option value="pjsip" <%= !trunk || trunk.trunkType === 'pjsip' ? 'selected' : '' %>>PJSIP (Recomendado)</option>
+                                    <option value="sip" <%= trunk && trunk.trunkType === 'sip' ? 'selected' : '' %>>SIP (Legacy)</option>
+                                    <option value="iax2" <%= trunk && trunk.trunkType === 'iax2' ? 'selected' : '' %>>IAX2</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="maxChannels" class="form-label">Canales Máximos</label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="maxChannels"
+                                       name="maxChannels"
+                                       value="<%= trunk ? trunk.maxChannels : 10 %>"
+                                       min="1"
+                                       max="999">
+                                <div class="form-text">Llamadas simultáneas</div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="priority" class="form-label">Prioridad</label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="priority"
+                                       name="priority"
+                                       value="<%= trunk ? trunk.priority : 10 %>"
+                                       min="1"
+                                       max="100">
+                                <div class="form-text">Mayor = más prioridad</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Estado</label>
+                            <select class="form-select"
+                                    id="status"
+                                    name="status">
+                                <option value="active" <%= !trunk || trunk.status === 'active' ? 'selected' : '' %>>Activa</option>
+                                <option value="inactive" <%= trunk && trunk.status === 'inactive' ? 'selected' : '' %>>Inactiva</option>
+                                <option value="maintenance" <%= trunk && trunk.status === 'maintenance' ? 'selected' : '' %>>Mantenimiento</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración de Conexión -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-globe"></i> Configuración de Conexión</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="host" class="form-label">Host/IP <span class="text-danger">*</span></label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="host"
+                                       name="host"
+                                       value="<%= trunk ? trunk.host : '' %>"
+                                       required
+                                       placeholder="sip.twilio.com">
+                                <div class="form-text">Dirección del servidor SIP</div>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="port" class="form-label">Puerto <span class="text-danger">*</span></label>
+                                <input type="number"
+                                       class="form-control"
+                                       id="port"
+                                       name="port"
+                                       value="<%= trunk ? trunk.port : 5060 %>"
+                                       required
+                                       min="1"
+                                       max="65535">
+                                <div class="form-text">Típicamente 5060</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credenciales -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Credenciales de Autenticación</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Usuario/Account SID</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="username"
+                                       name="username"
+                                       value="<%= trunk ? (trunk.username || '') : '' %>"
+                                       autocomplete="off"
+                                       placeholder="ACxxxxxxxxxxxxx">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Contraseña/Auth Token</label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control"
+                                           id="password"
+                                           name="password"
+                                           value="<%= trunk ? (trunk.password || '') : '' %>"
+                                           autocomplete="new-password"
+                                           placeholder="<%= trunk ? '••••••••••••' : '' %>">
+                                    <button class="btn btn-outline-secondary"
+                                            type="button"
+                                            onclick="togglePassword()">
+                                        <i class="bi bi-eye" id="toggleIcon"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    <% if (trunk) { %>
+                                        Dejar vacío para mantener contraseña actual
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fromUser" class="form-label">From User</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="fromUser"
+                                       name="fromUser"
+                                       value="<%= trunk ? (trunk.fromUser || '') : '' %>"
+                                       placeholder="caller_id_number">
+                                <div class="form-text">Usuario en el encabezado From</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="fromDomain" class="form-label">From Domain</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="fromDomain"
+                                       name="fromDomain"
+                                       value="<%= trunk ? (trunk.fromDomain || '') : '' %>"
+                                       placeholder="sip.example.com">
+                                <div class="form-text">Dominio en el encabezado From</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <a href="/trunks" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> <%= action === 'create' ? 'Crear Troncal' : 'Guardar Cambios' %>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Panel de Ayuda -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4 border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-question-circle"></i> Ayuda</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Configuración por Proveedor</h6>
+
+                    <div class="mb-3">
+                        <strong>Twilio:</strong>
+                        <ul class="small mb-0">
+                            <li>Host: <code>sip.twilio.com</code></li>
+                            <li>Puerto: <code>5060</code></li>
+                            <li>Usuario: Account SID</li>
+                            <li>Contraseña: Auth Token</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Vonage:</strong>
+                        <ul class="small mb-0">
+                            <li>Host: <code>sip.nexmo.com</code></li>
+                            <li>Puerto: <code>5060</code></li>
+                            <li>Usuario: API Key</li>
+                            <li>Contraseña: API Secret</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning small mb-0">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Importante:</strong> Las credenciales se almacenan de forma segura. Nunca compartas tus tokens de autenticación.
+                    </div>
+                </div>
+            </div>
+
+            <% if (trunk) { %>
+            <div class="card shadow-sm border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Información</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-2">
+                        <strong>Creada:</strong><br>
+                        <%= new Date(trunk.createdAt).toLocaleString('es-ES') %>
+                    </p>
+                    <p class="small mb-0">
+                        <strong>Última actualización:</strong><br>
+                        <%= new Date(trunk.updatedAt).toLocaleString('es-ES') %>
+                    </p>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('bi-eye');
+        toggleIcon.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash');
+        toggleIcon.classList.add('bi-eye');
+    }
+}
+
+// Form validation
+document.getElementById('trunkForm').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const provider = document.getElementById('provider').value;
+    const host = document.getElementById('host').value.trim();
+    const port = document.getElementById('port').value;
+
+    if (!name || !provider || !host || !port) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Campos requeridos',
+            text: 'Por favor completa todos los campos obligatorios marcados con *',
+            icon: 'warning'
+        });
+        return false;
+    }
+
+    return true;
+});
+</script>
+
+<style>
+.form-label {
+    font-weight: 600;
+}
+
+.card-header h5 {
+    font-size: 1rem;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+</style>

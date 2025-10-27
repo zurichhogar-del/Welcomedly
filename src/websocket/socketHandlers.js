@@ -1,4 +1,5 @@
 import agentStatusService from '../services/agentStatusService.js';
+import enhancedAIService from '../services/enhancedAIService.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -181,21 +182,42 @@ class SocketHandlers {
                 socket.lastPing = Date.now();
             });
 
-            // Manejar desconexión
+            // Sprint 2.2: Manejar desconexión con gracia period
             socket.on('disconnect', (reason) => {
-                logger.debug(`Cliente WebSocket desconectado`, { socketId: socket.id, reason });
+                logger.debug(`Cliente WebSocket desconectado`, { socketId: socket.id, reason, userId: socket.userId });
 
                 if (socket.userId) {
                     // Desconectar agente
                     this.connectedAgents.delete(socket.userId);
 
-                    // Cambiar estado a offline
-                    agentStatusService.changeAgentStatus(
-                        socket.userId,
-                        'offline',
-                        `Desconexión WebSocket: ${reason}`,
-                        { socketId: socket.id, disconnectionTime: new Date() }
-                    );
+                    // Sprint 2.2: No cambiar estado a offline inmediatamente
+                    // Dar 30 segundos de gracia para reconexión automática
+                    const gracePeriod = 30000; // 30 segundos
+
+                    // Guardar timeout para poder cancelarlo si se reconecta
+                    socket.disconnectionTimeout = setTimeout(async () => {
+                        try {
+                            // Solo cambiar a offline si no se reconectó en el periodo de gracia
+                            if (!this.connectedAgents.has(socket.userId)) {
+                                await agentStatusService.changeAgentStatus(
+                                    socket.userId,
+                                    'offline',
+                                    `Desconexión WebSocket: ${reason}`,
+                                    { socketId: socket.id, disconnectionTime: new Date() }
+                                );
+
+                                logger.info('Agente marcado offline tras periodo de gracia', {
+                                    userId: socket.userId,
+                                    reason
+                                });
+                            }
+                        } catch (error) {
+                            logger.error('Error al marcar agente offline', {
+                                error: error.message,
+                                userId: socket.userId
+                            });
+                        }
+                    }, gracePeriod);
 
                     // Notificar a supervisores
                     this.notifySupervisors('agent:disconnected', {
@@ -244,6 +266,128 @@ class SocketHandlers {
             socket.on('stop:monitor:agent', (agentId) => {
                 socket.leave(`monitor:${agentId}`);
                 socket.emit('monitoring:stopped', { agentId });
+            });
+
+            // =================== Sprint 3.2: AI Assistant WebSocket Events ===================
+
+            // Sprint 3.2: Solicitar sugerencias IA
+            socket.on('ai:request_suggestions', async (data) => {
+                try {
+                    if (!socket.userId) {
+                        socket.emit('error', { message: 'No autenticado' });
+                        return;
+                    }
+
+                    const { context, customerMessage } = data;
+
+                    logger.info('Sprint 3.2: WebSocket - Solicitando sugerencias IA', {
+                        agentId: socket.userId,
+                        context
+                    });
+
+                    const result = await enhancedAIService.getRealTimeAssistance({
+                        agentId: socket.userId,
+                        context: context || {},
+                        customerMessage: customerMessage || 'Sin mensaje del cliente'
+                    });
+
+                    socket.emit('ai:suggestion', {
+                        suggestions: result.suggestions || [
+                            { title: 'Mantén el profesionalismo', text: 'Usa un tono amable y profesional' },
+                            { title: 'Escucha activa', text: 'Repite puntos clave para mostrar comprensión' },
+                            { title: 'Ofrece soluciones', text: 'Proporciona alternativas personalizadas' }
+                        ],
+                        sentiment: result.sentiment || { type: 'neutral', confidence: 0.5 },
+                        timestamp: new Date()
+                    });
+
+                } catch (error) {
+                    logger.error('Error en ai:request_suggestions', {
+                        error: error.message,
+                        userId: socket.userId
+                    });
+                    socket.emit('error', { message: 'Error obteniendo sugerencias IA' });
+                }
+            });
+
+            // Sprint 3.2: Transcripción de audio en tiempo real
+            socket.on('ai:transcribe_audio', async (data) => {
+                try {
+                    if (!socket.userId) {
+                        socket.emit('error', { message: 'No autenticado' });
+                        return;
+                    }
+
+                    const { audioBuffer, speaker } = data;
+
+                    logger.info('Sprint 3.2: WebSocket - Transcribiendo audio', {
+                        agentId: socket.userId,
+                        speaker
+                    });
+
+                    const transcription = await enhancedAIService.transcribeAudio(audioBuffer);
+
+                    socket.emit('ai:transcription', {
+                        text: transcription.text,
+                        speaker: speaker || 'Cliente',
+                        confidence: transcription.confidence || 0.9,
+                        timestamp: new Date()
+                    });
+
+                    // Analizar sentimiento del texto transcrito
+                    const sentiment = await enhancedAIService.analyzeSentiment(transcription.text);
+
+                    socket.emit('ai:sentiment', {
+                        sentiment: sentiment.type || 'neutral',
+                        confidence: sentiment.confidence || 0.5,
+                        timestamp: new Date()
+                    });
+
+                } catch (error) {
+                    logger.error('Error en ai:transcribe_audio', {
+                        error: error.message,
+                        userId: socket.userId
+                    });
+                    socket.emit('error', { message: 'Error transcribiendo audio' });
+                }
+            });
+
+            // Sprint 3.2: Analizar sentimiento manual
+            socket.on('ai:analyze_sentiment', async (data) => {
+                try {
+                    if (!socket.userId) {
+                        socket.emit('error', { message: 'No autenticado' });
+                        return;
+                    }
+
+                    const { text } = data;
+
+                    if (!text) {
+                        socket.emit('error', { message: 'Se requiere texto para análisis' });
+                        return;
+                    }
+
+                    logger.info('Sprint 3.2: WebSocket - Analizando sentimiento', {
+                        agentId: socket.userId,
+                        textLength: text.length
+                    });
+
+                    const sentiment = await enhancedAIService.analyzeSentiment(text);
+
+                    socket.emit('ai:sentiment', {
+                        sentiment: sentiment.type || 'neutral',
+                        confidence: sentiment.confidence || 0.5,
+                        details: sentiment.details,
+                        timestamp: new Date()
+                    });
+
+                } catch (error) {
+                    logger.error('Error en ai:analyze_sentiment', {
+                        error: error.message,
+                        userId: socket.userId
+                    });
+                    socket.emit('error', { message: 'Error analizando sentimiento' });
+                }
             });
 
         });
