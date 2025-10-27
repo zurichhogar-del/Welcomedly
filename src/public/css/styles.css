@@ -318,3 +318,10 @@ nav a:hover{
 #tab-reg{
     width: 95%;
 }
+
+/* Auth buttons */
+.btn-register {
+    background-color: var(--corporate-blue) !important;
+    border: none !important;
+    color: white !important;
+}

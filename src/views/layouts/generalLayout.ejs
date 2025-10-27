@@ -37,7 +37,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <% if (swalError) { %>
-<script>
+<script nonce="<%= cspNonce %>">
     Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -47,7 +47,7 @@
 <% } %>
 
 <% if (mensajeExito) { %>
-<script>
+<script nonce="<%= cspNonce %>">
     Swal.fire({
         icon: 'success',
         title: 'Éxito',
@@ -58,7 +58,7 @@
 
 <!-- CSRF Helper -->
 <script type="module" src="/js/csrfHelper.js"></script>
-<script>
+<script nonce="<%= cspNonce %>">
     // Inicializar protección CSRF cuando el DOM esté listo
     document.addEventListener('DOMContentLoaded', function() {
         // Importar y ejecutar initCSRFProtection

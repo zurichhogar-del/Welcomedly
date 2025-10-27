@@ -393,14 +393,14 @@ class AgentStatusController {
      */
     async showSupervisorDashboard(req, res) {
         try {
-            // Validar que el usuario es supervisor
-            if (req.session.usuario.rol !== 'ADMIN') {
+            // Validar que el usuario es supervisor o admin
+            if (req.session.usuario.rol !== 'ADMIN' && req.session.usuario.rol !== 'SUPERVISOR') {
                 req.session.swalError = 'Acceso denegado. Se requiere rol de supervisor.';
                 return res.redirect('/');
             }
 
+            // Renderizar sin layout porque dashboard.ejs es una página HTML completa
             res.render('supervisor/dashboard', {
-                layout: 'layouts/generalLayout',
                 title: 'Dashboard Supervisor - Welcomedly',
                 usuario: req.session.usuario
             });

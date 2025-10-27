@@ -15,8 +15,7 @@ export const helmetConfig = helmet({
             defaultSrc: ["'self'"],
             styleSrc: [
                 "'self'",
-                // Eliminar 'unsafe-inline' y usar nonce
-                (req, res) => `'nonce-${res.locals.cspNonce}'`,
+                "'unsafe-inline'", // Requerido para SweetAlert2 y estilos inline
                 "https://cdn.jsdelivr.net",
                 "https://cdnjs.cloudflare.com",
                 "https://fonts.googleapis.com"
